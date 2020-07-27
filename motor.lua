@@ -1,15 +1,5 @@
 local v3_len = vector.length
-local function set_yaw(self, dtime)
-	local yaw = 0
-	if self.old_dir.x < 0 then
-		yaw = 0.5
-	elseif self.old_dir.x > 0 then
-		yaw = 1.5
-	elseif self.old_dir.z < 0 then
-		yaw = 1
-	end
-	self.object:set_yaw(yaw * math.pi)
-end
+
 local function rail_on_step(self, dtime)
 	if not self.running then
 		return
@@ -178,6 +168,7 @@ minetest.register_entity("unrailedtrain:motor", {
 	carts = {},
   on_activate = function(self, staticdata, dtime_s) 
 		self.object:set_armor_groups({immortal=1})
+		self.carts = {}
 		table.insert(self.carts, self)
 		self.stop(self)
   end,
@@ -185,19 +176,7 @@ minetest.register_entity("unrailedtrain:motor", {
     rail_on_step(self, dtime)
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		if self.carts[2] ~= nil then
-			return
-		end
-		-- change train direction
-		if not vector.equals(self.old_dir, {x=0, y=0, z=0}) then
-			self.old_dir = vector.multiply(self.old_dir, -1)
-		else
-			local d = find_previous_trail_pos(self.object:get_pos(), nil)
-			if d then
-				self.old_dir = vector.add(d, vector.multiply(self.object:get_pos(), -1))
-			end
-		end
-		set_yaw(self)
+		unrailedtrain:on_punch_on_motor(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	end,
 	on_rightclick = function(self, clicker)
 		local item = clicker:get_wielded_item()
@@ -243,11 +222,9 @@ minetest.register_craftitem("unrailedtrain:motor", {
 			
 			local trail_pos = find_next_free_trail(under, nil)
 			if trail_pos then
-				print("Test")
 				entity.old_dir = vector.direction(under, trail_pos)
 			end
-
-			table.insert(unrailedtrain.trains, entity)
+			unrailedtrain:add_train(entity)
 		end
 	end,
 })

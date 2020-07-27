@@ -3,6 +3,18 @@ local function get_railparams(pos)
 	return carts.railparams[node.name] or {}
 end
 
+local function set_entity_yaw(self)
+	local yaw = 0
+	if self.old_dir.x < 0 then
+		yaw = 0.5
+	elseif self.old_dir.x > 0 then
+		yaw = 1.5
+	elseif self.old_dir.z < 0 then
+		yaw = 1
+	end
+	self.object:set_yaw(yaw * math.pi)
+end
+
 function find_next_free_trail(pos, dir)
   local t = {
     vector.add(pos, {x=-1, y=0, z=0}),
@@ -136,23 +148,18 @@ function unrailedtrain:detach_cart(motor, cart)
   table.remove(motor.carts, cart_index)
 end
 
-function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)
-	local pos = cart_entity.object:get_pos()
-  local vel = cart_entity.object:get_velocity()
-  
+function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)  
 	-- Player digs cart by sneak-punch
 	if puncher:get_player_control().sneak then
 		if cart_entity.sound_handle then
 			minetest.sound_stop(cart_entity.sound_handle)
 		end
-		-- Detach driver and items
+		-- Detach items
 		for _, obj_ in ipairs(cart_entity.attached_items) do
 			if obj_ then
 				obj_:set_detach()
 			end
 		end
-		-- Pick up cart
-		local inv = puncher:get_inventory()
 
     -- Add a replacement cart to the world
     minetest.add_item(cart_entity.object:get_pos(), leftover)
@@ -160,4 +167,36 @@ function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_pun
     cart_entity.object:remove()
 		return
 	end
+end
+
+
+function unrailedtrain:on_punch_on_motor(entity, puncher, time_from_last_punch, tool_capabilities, direction)
+  if table.length(entity.carts) > 1 then
+    return
+  end
+
+  
+	-- Player digs cart by sneak-punch
+	if puncher:get_player_control().sneak then
+		if entity.sound_handle then
+			minetest.sound_stop(entity.sound_handle)
+		end
+
+    -- Add a replacement cart to the world
+    -- minetest.add_item(entity.object:get_pos(), leftover)
+    unrailedtrain:remove_train(entity)
+    entity.object:remove()
+		return
+  end
+  
+  -- change train direction
+  if not vector.equals(entity.old_dir, {x=0, y=0, z=0}) then
+    entity.old_dir = vector.multiply(entity.old_dir, -1)
+  else
+    local d = find_previous_trail_pos(entity.object:get_pos(), nil)
+    if d then
+      entity.old_dir = vector.add(d, vector.multiply(entity.object:get_pos(), -1))
+    end
+  end
+  set_entity_yaw(entity)
 end
