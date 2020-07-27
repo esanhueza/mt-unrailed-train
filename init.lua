@@ -1,22 +1,22 @@
 
-mytrain = {}
-mytrain.modpath = minetest.get_modpath("mytrain")
+unrailedtrain = {}
+unrailedtrain.modpath = minetest.get_modpath("unrailedtrain")
 
 -- Maximal speed of the cart in m/s (min = -1)
-mytrain.speed_max = 0.15
-mytrain.acceleration = 0.01
-mytrain.trains = {}
+unrailedtrain.speed_max = 0.15
+unrailedtrain.acceleration = 0.01
+unrailedtrain.trains = {}
 
 
-mytrain.groups = {
+unrailedtrain.groups = {
 	carts = { 
-		"mytrain:cargo_cart",
-		"mytrain:water_tank"
+		"unrailedtrain:cargo_cart",
+		"unrailedtrain:water_tank"
 	 }
 }
 
-dofile(mytrain.modpath.."/functions.lua")
-dofile(mytrain.modpath.."/motor.lua")
-dofile(mytrain.modpath.."/cargo_cart.lua")
-dofile(mytrain.modpath.."/water_tank.lua")
+dofile(unrailedtrain.modpath.."/functions.lua")
+dofile(unrailedtrain.modpath.."/motor.lua")
+dofile(unrailedtrain.modpath.."/cargo_cart.lua")
+dofile(unrailedtrain.modpath.."/water_tank.lua")
 

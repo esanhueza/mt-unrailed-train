@@ -110,7 +110,7 @@ local function rail_on_step(self, dtime)
 
 
 		-- no need to check for railparams == nil since we always make it exist.
-		local speed_mod = mytrain.acceleration
+		local speed_mod = unrailedtrain.acceleration
 		if speed_mod and speed_mod ~= 0 then
 			acc = acc + speed_mod
 		else
@@ -120,7 +120,7 @@ local function rail_on_step(self, dtime)
 	end
 
 	-- Limits
-	local max_vel = mytrain.speed_max
+	local max_vel = unrailedtrain.speed_max
 	for _, v in pairs({"x","y","z"}) do
 		if math.abs(vel[v]) > max_vel then
 			vel[v] = carts:get_sign(vel[v]) * max_vel
@@ -160,7 +160,7 @@ local function rail_on_step(self, dtime)
 	-- rail_on_step_event(railparams.on_step, self, dtime)
 end
 
-minetest.register_entity("mytrain:motor", {
+minetest.register_entity("unrailedtrain:motor", {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
@@ -176,7 +176,6 @@ minetest.register_entity("mytrain:motor", {
 	running = false,
 	owner = nil,
 	carts = {},
-	cart_index = 1,
   on_activate = function(self, staticdata, dtime_s) 
 		self.object:set_armor_groups({immortal=1})
 		table.insert(self.carts, self)
@@ -203,32 +202,26 @@ minetest.register_entity("mytrain:motor", {
 	on_rightclick = function(self, clicker)
 		local item = clicker:get_wielded_item()
 		
-		local is_cart = table.find(mytrain.groups.carts, item:get_name())
+		local is_cart = table.find(unrailedtrain.groups.carts, item:get_name())
 		if not is_cart then
 			return
 		end 
-		mytrain:attach_cart(self, 1, item)
+		unrailedtrain:attach_cart(self, 1, item)
 	end,
 	stop = function(self) 
 		self.running = false
 		self.object:set_properties({pointable = true})
 		self.object:set_acceleration({x=0, y=0, z=0})
 		self.object:set_velocity({x=0, y=0, z=0})
-		for _,cart in ipairs(self.carts) do
-			cart.running = false
-		end
 	end,
 	start = function(self)
 		self.running = true
 		self.object:set_velocity(vector.add(self.old_dir, 0.1))
 		self.object:set_properties({pointable = false})
-		for _,cart in ipairs(self.carts) do
-			cart.running = true
-		end
 	end,
 })
 
-minetest.register_craftitem("mytrain:motor", {
+minetest.register_craftitem("unrailedtrain:motor", {
 	description = "Train motor",
 	wield_image = "dirt.png",
 	on_place = function(itemstack, placer, pointed_thing)
@@ -244,7 +237,7 @@ minetest.register_craftitem("mytrain:motor", {
 		end
 
 		if node.name == "carts:rail" then
-			local obj =	minetest.add_entity(under, "mytrain:motor")
+			local obj =	minetest.add_entity(under, "unrailedtrain:motor")
 			local entity = obj:get_luaentity()
 			entity.owner = placer
 			
@@ -254,7 +247,7 @@ minetest.register_craftitem("mytrain:motor", {
 				entity.old_dir = vector.direction(under, trail_pos)
 			end
 
-			table.insert(mytrain.trains, entity)
+			table.insert(unrailedtrain.trains, entity)
 		end
 	end,
 })

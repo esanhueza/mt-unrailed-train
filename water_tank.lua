@@ -1,6 +1,6 @@
 
 
-minetest.register_entity("mytrain:water_tank", {
+minetest.register_entity("unrailedtrain:water_tank", {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
@@ -16,7 +16,6 @@ minetest.register_entity("mytrain:water_tank", {
   parent = nil,
 	owner = nil,
 	attached_items = {},
-  cart_index = nil,
   on_activate = function(self, staticdata, dtime_s)
     self.object:set_armor_groups({immortal=1})
   end,
@@ -27,15 +26,15 @@ minetest.register_entity("mytrain:water_tank", {
     end
   end,
   on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction)
-    mytrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
+    unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
   end,
   on_rightclick = function(self, clicker)
-    mytrain:on_rightclick_over_cart(self, clicker)
+    unrailedtrain:on_rightclick_over_cart(self, clicker)
   end
 })
 
 
-minetest.register_craftitem("mytrain:water_tank", {
+minetest.register_craftitem("unrailedtrain:water_tank", {
 	description = "Water tank",
 	inventory_image = minetest.inventorycube("tnt_side.png", "tnt_side.png", "tnt_side.png"),
 	wield_image = "tnt_side.png",
@@ -52,7 +51,7 @@ minetest.register_craftitem("mytrain:water_tank", {
 		end
     -- print(dump(pointed_thing))
 		-- if node.name == "carts:rail" then
-      --local obj = minetest.add_entity(under, "mytrain:cargo_cart")
+      --local obj = minetest.add_entity(under, "unrailedtrain:cargo_cart")
       --obj.owner = placer
       
 		--end

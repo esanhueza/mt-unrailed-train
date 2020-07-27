@@ -63,7 +63,7 @@ function table.empty (self)
   return true
 end
 
-function mytrain:on_rightclick_over_cart(self, clicker)
+function unrailedtrain:on_rightclick_over_cart(self, clicker)
   local item = clicker:get_wielded_item()
   local motor = self
   
@@ -71,16 +71,16 @@ function mytrain:on_rightclick_over_cart(self, clicker)
     motor = self.parent
   end
   
-  local is_cart = table.find(mytrain.groups.carts, item:get_name())
+  local is_cart = table.find(unrailedtrain.groups.carts, item:get_name())
   if not is_cart then
     return
   end
 
   local cart_index = table.find_index(motor.carts, self)
-  mytrain:attach_cart(motor, cart_index, item)
+  unrailedtrain:attach_cart(motor, cart_index, item)
 end
 
-function mytrain:attach_cart(motor, cart_pos, cart)
+function unrailedtrain:attach_cart(motor, cart_pos, cart)
   local dir = motor.carts[cart_pos].old_dir
   local new_pos = find_next_free_trail(
     vector.round(motor.carts[cart_pos].object:get_pos()), 
@@ -103,10 +103,10 @@ function mytrain:attach_cart(motor, cart_pos, cart)
         end
       end
     end
+
     local obj = minetest.add_entity(new_pos, cart:get_name())
     local entity = obj:get_luaentity()
     entity.parent = motor
-    entity.cart_index = cart_pos + 1
     entity.old_dir = vector.direction(
       new_pos,
       motor.carts[cart_pos].object:get_pos()
@@ -117,12 +117,26 @@ function mytrain:attach_cart(motor, cart_pos, cart)
   end
 end
 
-function mytrain:detach_cart(motor, cart)
+function unrailedtrain:detach_cart(motor, cart)
+  -- Remove cart and rearrange the rest of the carts
   local cart_index = table.find_index(motor.carts, cart)
+  local changes = {}
+  for i,v in pairs(motor.carts) do
+    if i > cart_index then
+      changes[i] = {
+        pos = motor.carts[i-1].object:get_pos(),
+        dir = motor.carts[i-1].dir
+      }
+    end
+  end
+  for i,v in pairs(changes) do
+    motor.carts[i].object:set_pos(v.pos)
+    motor.carts[i].dir = v.dir
+  end
   table.remove(motor.carts, cart_index)
 end
 
-function mytrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)
+function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)
 	local pos = cart_entity.object:get_pos()
   local vel = cart_entity.object:get_velocity()
   
@@ -142,7 +156,7 @@ function mytrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, to
 
     -- Add a replacement cart to the world
     minetest.add_item(cart_entity.object:get_pos(), leftover)
-    mytrain:detach_cart(cart_entity.parent, cart_entity)
+    unrailedtrain:detach_cart(cart_entity.parent, cart_entity)
     cart_entity.object:remove()
 		return
 	end
