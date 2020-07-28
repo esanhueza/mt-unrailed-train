@@ -154,9 +154,9 @@ minetest.register_entity("unrailedtrain:motor", {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
-		mesh = "carts_cart.b3d",
+		mesh = "train_1.b3d",
 		visual_size = {x=1, y=1},
-		textures = {"tnt_top.png", "tnt_top.png", "tnt_side.png", "tnt_top.png", "tnt_top.png", "tnt_side.png"},
+		textures = {"railers.png"},
 		static_save = false
 	},
 	old_dir = {x=0, y=0, z=0},

@@ -4,10 +4,9 @@ minetest.register_entity("unrailedtrain:water_tank", {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
-		mesh = "carts_cart.b3d",
-		visual_size = {x=0.9, y=0.5},
+		mesh = "water_tank_1.b3d",
 		-- textures = {"carts_cart.png"},
-		textures = {"tnt_side.png"},
+		textures = {"railers.png"},
 		static_save = false,
 	},
 	old_pos = nil,

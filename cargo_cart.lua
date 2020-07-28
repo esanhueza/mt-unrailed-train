@@ -4,9 +4,8 @@ minetest.register_entity("unrailedtrain:cargo_cart", {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
-		mesh = "carts_cart.b3d",
-		visual_size = {x=1, y=0.8},
-		textures = {"carts_cart.png"},
+		mesh = "cargo_cart_1.b3d",
+		textures = {"railers.png"},
 		static_save = false,
 	},
 	old_pos = nil,
