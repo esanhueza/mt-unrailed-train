@@ -1,6 +1,5 @@
 
-
-minetest.register_entity("unrailedtrain:cargo_cart", {
+local cargo_entity = {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
@@ -13,24 +12,44 @@ minetest.register_entity("unrailedtrain:cargo_cart", {
 	railtype = nil,
   parent = nil,
 	owner = nil,
-	attached_items = {},
-  on_activate = function(self, staticdata, dtime_s)
-    self.object:set_armor_groups({immortal=1})
-  end,
-  on_step = function(self, dtime)
-    if self.parent ~= nil and self.parent.running then
-      self.object:set_velocity(self.parent.object:get_velocity())
-      self.old_dir = vector.normalize(self.object:get_velocity())
-    end
-  end,
-  on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction)
-    unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
-  end,
-  on_rightclick = function(self, clicker)
-    unrailedtrain:on_rightclick_over_cart(self, clicker)
-  end
-})
+	cargo = {
+		material_1 = 0,
+		material_2 = 0,
+	},
+}
 
+function cargo_entity:add_material_1()
+	self.cargo.material_1 = self.cargo.material_1 + 1
+	local obj = minetest.add_entity(self.object:get_pos(), "unrailedtrain:iron_1")
+	obj:set_attach(self.object, "", {x=0, y=0, z=0}, {x=0, y=0, z=0})
+end
+
+function cargo_entity:on_step(dtime)
+	if self.parent ~= nil and self.parent.running then
+		self.object:set_velocity(self.parent.object:get_velocity())
+		self.old_dir = vector.normalize(self.object:get_velocity())
+	end
+end
+
+function cargo_entity:on_activate(staticdata, dtime_s)
+	self.object:set_armor_groups({immortal=1})
+end
+
+function cargo_entity:on_rightclick(clicker)
+	if clicker:get_wielded_item() then
+		local item = clicker:get_wielded_item()
+		if item:get_name() == "default:iron_lump" then
+			self.add_material_1(item)
+		end
+	end
+	unrailedtrain:on_rightclick_over_cart(self, clicker)
+end
+
+function cargo_entity:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)  
+	unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
+end
+
+minetest.register_entity("unrailedtrain:cargo_cart", cargo_entity)
 
 minetest.register_craftitem("unrailedtrain:cargo_cart", {
 	description = "Cargo cart",
@@ -47,11 +66,5 @@ minetest.register_craftitem("unrailedtrain:cargo_cart", {
 			return udef.on_rightclick(under, node, placer, itemstack,
 				pointed_thing) or itemstack
 		end
-    -- print(dump(pointed_thing))
-		-- if node.name == "carts:rail" then
-      --local obj = minetest.add_entity(under, "unrailedtrain:cargo_cart")
-      --obj.owner = placer
-      
-		--end
 	end,
 })

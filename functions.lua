@@ -148,18 +148,24 @@ function unrailedtrain:detach_cart(motor, cart)
   table.remove(motor.carts, cart_index)
 end
 
-function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)  
-	-- Player digs cart by sneak-punch
+function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)
+
+  print("test")
+  print(dump(cart_entity))
+  -- Player digs cart by sneak-punch
 	if puncher:get_player_control().sneak then
 		if cart_entity.sound_handle then
 			minetest.sound_stop(cart_entity.sound_handle)
-		end
+    end
+    
 		-- Detach items
-		for _, obj_ in ipairs(cart_entity.attached_items) do
-			if obj_ then
-				obj_:set_detach()
-			end
-		end
+    if cart_entity.cargo then
+      for _, obj_ in ipairs(cart_entity.cargo) do
+        if obj_ then
+          obj_:set_detach()
+        end
+      end
+    end
 
     -- Add a replacement cart to the world
     minetest.add_item(cart_entity.object:get_pos(), leftover)
@@ -168,7 +174,6 @@ function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_pun
 		return
 	end
 end
-
 
 function unrailedtrain:on_punch_on_motor(entity, puncher, time_from_last_punch, tool_capabilities, direction)
   if table.length(entity.carts) > 1 then

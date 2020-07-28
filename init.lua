@@ -29,6 +29,7 @@ function unrailedtrain:remove_train(train)
 end
 
 dofile(unrailedtrain.modpath.."/functions.lua")
+dofile(unrailedtrain.modpath.."/items.lua")
 dofile(unrailedtrain.modpath.."/motor.lua")
 dofile(unrailedtrain.modpath.."/cargo_cart.lua")
 dofile(unrailedtrain.modpath.."/water_tank.lua")
