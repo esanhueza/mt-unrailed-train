@@ -12,16 +12,35 @@ local cargo_entity = {
 	railtype = nil,
   parent = nil,
 	owner = nil,
-	cargo = {
-		material_1 = 0,
-		material_2 = 0,
-	},
 }
 
-function cargo_entity:add_material_1()
-	self.cargo.material_1 = self.cargo.material_1 + 1
+function cargo_entity:add_material_1(item)
 	local obj = minetest.add_entity(self.object:get_pos(), "unrailedtrain:iron_1")
-	obj:set_attach(self.object, "", {x=0, y=0, z=0}, {x=0, y=0, z=0})
+	obj:set_attach(self.object, "", {
+		x= 2 * (self.cargo.material_1 % 2 == 0 and -1 or 1), 
+		y= math.floor(self.cargo.material_1 / 2) * 1.5 - 1.5, -- the y offset between the base of the car and the material, 
+		z= 2 * (self.cargo.material_1 % 2 == 0 and 1 or -1)
+	}, {
+		x= 0, 
+		y= 90 * self.cargo.material_1, 
+		z= 0
+	})
+	self.cargo.material_1 = self.cargo.material_1 + 1
+end
+
+
+function cargo_entity:add_material_2(item)
+	local obj = minetest.add_entity(self.object:get_pos(), "unrailedtrain:wood_1")
+	obj:set_attach(self.object, "", {
+		x= 2 * (self.cargo.material_2 % 2 == 0 and -1 or 1), 
+		y= math.floor(self.cargo.material_2 / 2) * 1.5 - 1.5, -- the y offset between the base of the car and the material, 
+		z= 2 * (self.cargo.material_2 % 2 == 0 and -1 or 1)
+	}, {
+		x= 0, 
+		y= 90 * self.cargo.material_2, 
+		z= 0
+	})
+	self.cargo.material_2 = self.cargo.material_2 + 1
 end
 
 function cargo_entity:on_step(dtime)
@@ -33,13 +52,22 @@ end
 
 function cargo_entity:on_activate(staticdata, dtime_s)
 	self.object:set_armor_groups({immortal=1})
+	self.cargo = {
+		material_1 = 0,
+		material_2 = 0,
+	}
 end
 
 function cargo_entity:on_rightclick(clicker)
 	if clicker:get_wielded_item() then
 		local item = clicker:get_wielded_item()
 		if item:get_name() == "default:iron_lump" then
-			self.add_material_1(item)
+			self.add_material_1(self, item)
+			return
+		end
+		if string.match(item:get_name(), "_wood") or string.match(item:get_name(), "_tree") then
+			self.add_material_2(self, item)
+			return
 		end
 	end
 	unrailedtrain:on_rightclick_over_cart(self, clicker)

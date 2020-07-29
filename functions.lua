@@ -149,9 +149,6 @@ function unrailedtrain:detach_cart(motor, cart)
 end
 
 function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)
-
-  print("test")
-  print(dump(cart_entity))
   -- Player digs cart by sneak-punch
 	if puncher:get_player_control().sneak then
 		if cart_entity.sound_handle then
