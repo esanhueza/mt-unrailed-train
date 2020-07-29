@@ -12,9 +12,11 @@ local cargo_entity = {
 	railtype = nil,
   parent = nil,
 	owner = nil,
+	capacity = 4,
 }
 
 function cargo_entity:add_material_1(item)
+	if (self.capacity < self.cargo.material_1) then return 0 end
 	local obj = minetest.add_entity(self.object:get_pos(), "unrailedtrain:iron_1")
 	obj:set_attach(self.object, "", {
 		x= 2 * (self.cargo.material_1 % 2 == 0 and -1 or 1), 
@@ -30,6 +32,7 @@ end
 
 
 function cargo_entity:add_material_2(item)
+	if (self.capacity < self.cargo.material_2) then return 0 end
 	local obj = minetest.add_entity(self.object:get_pos(), "unrailedtrain:wood_1")
 	obj:set_attach(self.object, "", {
 		x= 2 * (self.cargo.material_2 % 2 == 0 and -1 or 1), 

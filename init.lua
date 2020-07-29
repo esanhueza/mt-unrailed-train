@@ -11,7 +11,7 @@ unrailedtrain.groups = {
 	carts = { 
 		"unrailedtrain:cargo_cart",
 		"unrailedtrain:water_tank"
-	 }
+	 },
 }
 
 function unrailedtrain:add_train(train)
