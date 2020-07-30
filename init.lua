@@ -10,6 +10,7 @@ unrailedtrain.trains = {}
 unrailedtrain.groups = {
 	carts = { 
 		"unrailedtrain:cargo_cart",
+		"unrailedtrain:rail_crafter",
 		"unrailedtrain:water_tank"
 	 },
 }
@@ -30,7 +31,9 @@ end
 
 dofile(unrailedtrain.modpath.."/functions.lua")
 dofile(unrailedtrain.modpath.."/items.lua")
+dofile(unrailedtrain.modpath.."/rails.lua")
 dofile(unrailedtrain.modpath.."/motor.lua")
+dofile(unrailedtrain.modpath.."/rail_crafter.lua")
 dofile(unrailedtrain.modpath.."/cargo_cart.lua")
 dofile(unrailedtrain.modpath.."/water_tank.lua")
 

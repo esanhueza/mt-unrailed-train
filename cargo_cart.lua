@@ -76,7 +76,7 @@ function cargo_entity:on_rightclick(clicker)
 	unrailedtrain:on_rightclick_over_cart(self, clicker)
 end
 
-function cargo_entity:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)  
+function cargo_entity:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)
 	unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
 end
 

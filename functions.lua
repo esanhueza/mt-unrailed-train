@@ -172,6 +172,14 @@ function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_pun
 	end
 end
 
+function unrailedtrain:on_cart_step(self, dtime)
+	if self.parent ~= nil and self.parent.running then
+		self.object:set_velocity(self.parent.object:get_velocity())
+		self.old_dir = vector.normalize(self.object:get_velocity())
+	end
+end
+
+
 function unrailedtrain:on_punch_on_motor(entity, puncher, time_from_last_punch, tool_capabilities, direction)
   if table.length(entity.carts) > 1 then
     return

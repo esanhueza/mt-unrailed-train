@@ -157,7 +157,7 @@ minetest.register_entity("unrailedtrain:motor", {
 		mesh = "train_1.b3d",
 		visual_size = {x=1, y=1},
 		textures = {"railers.png"},
-		static_save = false
+		static_save = true
 	},
 	old_dir = {x=0, y=0, z=0},
 	velocity = {x=0, y=0, z=0},

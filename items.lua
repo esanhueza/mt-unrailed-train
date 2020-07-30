@@ -1,4 +1,3 @@
-
 minetest.register_entity("unrailedtrain:iron_1", {
 	initial_properties = {
 		collisionbox = {-0.01, -0.01, -0.01, 0.01, 0.01, 0.01},
@@ -8,7 +7,6 @@ minetest.register_entity("unrailedtrain:iron_1", {
 		static_save = false,
 	},
 })
-
 
 minetest.register_entity("unrailedtrain:wood_1", {
 	initial_properties = {
