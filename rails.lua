@@ -21,7 +21,9 @@ minetest.register_craftitem("unrailedtrain:rail_stack", {
 	on_place = function(itemstack, placer, pointed_thing)
 		if pointed_thing.type == 'node' and minetest.get_node_or_nil(pointed_thing.above) then
 			minetest.set_node(pointed_thing.above, {name="carts:rail"})
+			itemstack:take_item()
 		end
+		return itemstack
 	end,
 })
 
