@@ -150,7 +150,7 @@ local function rail_on_step(self, dtime)
 	-- rail_on_step_event(railparams.on_step, self, dtime)
 end
 
-minetest.register_entity("unrailedtrain:motor", {
+local entity_def = {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
@@ -165,40 +165,48 @@ minetest.register_entity("unrailedtrain:motor", {
 	railtype = nil,
 	running = false,
 	owner = nil,
-	carts = {},
-  on_activate = function(self, staticdata, dtime_s) 
-		self.object:set_armor_groups({immortal=1})
-		self.carts = {}
-		table.insert(self.carts, self)
-		self.stop(self)
-  end,
-  on_step = function(self, dtime)
-    rail_on_step(self, dtime)
-	end,
-	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		unrailedtrain:on_punch_on_motor(self, puncher, time_from_last_punch, tool_capabilities, dir)
-	end,
-	on_rightclick = function(self, clicker)
-		local item = clicker:get_wielded_item()
-		
-		local is_cart = table.find(unrailedtrain.groups.carts, item:get_name())
-		if not is_cart then
-			return
-		end 
-		unrailedtrain:attach_cart(self, 1, item)
-	end,
-	stop = function(self) 
-		self.running = false
-		self.object:set_properties({pointable = true})
-		self.object:set_acceleration({x=0, y=0, z=0})
-		self.object:set_velocity({x=0, y=0, z=0})
-	end,
-	start = function(self)
-		self.running = true
-		self.object:set_velocity(vector.add(self.old_dir, 0.1))
-		self.object:set_properties({pointable = false})
-	end,
-})
+	carts = {}	
+}
+
+function entity_def:on_step(dtime)
+	rail_on_step(self, dtime)
+end
+
+function entity_def:on_punch(puncher, time_from_last_punch, tool_capabilities, dir)
+	unrailedtrain:on_punch_on_motor(self, puncher, time_from_last_punch, tool_capabilities, dir)
+end
+
+function entity_def:on_rightclick(clicker)
+	local item = clicker:get_wielded_item()
+	
+	local is_cart = table.find(unrailedtrain.groups.carts, item:get_name())
+	if not is_cart then
+		return
+	end 
+	unrailedtrain:attach_cart(self, 1, item)
+end
+
+function entity_def:on_activate (staticdata, dtime_s) 
+	self.object:set_armor_groups({immortal=1})
+	self.carts = {}
+	table.insert(self.carts, self)
+	self.stop(self)
+end
+
+function entity_def:start()
+	self.running = true
+	self.object:set_velocity(vector.add(self.old_dir, 0.1))
+	self.object:set_properties({pointable = false})
+end
+
+function entity_def:stop() 
+	self.running = false
+	self.object:set_properties({pointable = true})
+	self.object:set_acceleration({x=0, y=0, z=0})
+	self.object:set_velocity({x=0, y=0, z=0})
+end
+
+minetest.register_entity("unrailedtrain:motor", entity_def)
 
 minetest.register_craftitem("unrailedtrain:motor", {
 	description = "Train motor",
@@ -220,10 +228,11 @@ minetest.register_craftitem("unrailedtrain:motor", {
 			local entity = obj:get_luaentity()
 			entity.owner = placer
 			
-			local trail_pos = find_next_free_trail(under, nil)
-			if trail_pos then
-				entity.old_dir = vector.direction(under, trail_pos)
-			end
+			local trail_pos = find_next_free_trail(under, placer:get_look_dir())
+			local trail_dir = vector.direction(under, trail_pos)
+			entity.old_dir = trail_dir
+			local yaw = vector.angle({x=0, y=0, z=1}, trail_dir)
+			entity.object:set_yaw(yaw)
 			unrailedtrain:add_train(entity)
 		end
 	end,
