@@ -16,6 +16,7 @@ minetest.register_entity("unrailedtrain:rail_1", {
 
 minetest.register_craftitem("unrailedtrain:rail_stack", {
 	description = "Stack of rails",
+	stack_max = 6,
 	inventory_image = "carts_rail_straight.png",
 	wield_image = "carts_rail_straight.png",
 	on_place = function(itemstack, placer, pointed_thing)

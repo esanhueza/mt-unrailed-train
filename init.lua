@@ -5,6 +5,7 @@ unrailedtrain.modpath = minetest.get_modpath("unrailedtrain")
 -- Maximal speed of the cart in m/s (min = -1)
 unrailedtrain.speed_max = 0.15
 unrailedtrain.acceleration = 0.01
+unrailedtrain.crafting_cooldown = 5
 unrailedtrain.trains = {}
 
 unrailedtrain.groups = {

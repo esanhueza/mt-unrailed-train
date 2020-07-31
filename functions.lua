@@ -130,6 +130,9 @@ function unrailedtrain:attach_cart(motor, cart_pos, cart)
 end
 
 function unrailedtrain:detach_cart(motor, cart)
+  if not motor then
+    return
+  end
   -- Remove cart and rearrange the rest of the carts
   local cart_index = table.find_index(motor.carts, cart)
   local changes = {}
@@ -209,4 +212,47 @@ function unrailedtrain:on_punch_on_motor(entity, puncher, time_from_last_punch, 
     end
   end
   set_entity_yaw(entity)
+end
+
+function unrailedtrain:take_materials(amount1, amount2)
+	local cargo_cart = nil
+  for i,v in ipairs(self.carts) do
+		if v.object:get_entity_name() == "unrailedtrain:cargo_cart" then
+			cargo_cart = v
+		end
+	end
+	if cargo_cart ~= nil then
+		local mat1_amount = unrailedtrain.take_material1_from_cart(cargo_cart, amount1)
+		local mat2_amount = unrailedtrain.take_material2_from_cart(cargo_cart, amount2)
+		return { 
+			mat1 = mat1_amount,
+			mat2 = mat2_amount
+		}
+	end
+	return nil
+end
+
+
+function unrailedtrain:take_material1_from_cart(amount)
+  if amount <= 0 or self.cargo.mat1_count == 0 then return 0 end
+  local removed = self.cargo.mat1_count >= amount and amount or self.cargo.mat1_count
+  for i=1,removed do
+    local mat = table.remove( self.cargo.mat1_entities )
+    mat.object:set_detach()
+    mat.object:remove()
+  end
+  self.cargo.mat1_count = self.cargo.mat1_count - removed
+  return removed
+end
+
+function unrailedtrain:take_material2_from_cart(amount)
+  if amount <= 0 or self.cargo.mat2_count == 0 then return 0 end
+  local removed = self.cargo.mat2_count >= amount and amount or self.cargo.mat2_count
+  for i=1,removed do
+    local mat = table.remove( self.cargo.mat2_entities )
+    mat.object:set_detach()
+    mat.object:remove()
+  end
+  self.cargo.mat2_count = self.cargo.mat2_count - removed
+  return removed
 end

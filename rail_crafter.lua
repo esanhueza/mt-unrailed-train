@@ -1,4 +1,3 @@
-
 local entity_def = {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
@@ -12,7 +11,8 @@ local entity_def = {
 	railtype = nil,
   parent = nil,
 	owner = nil,
-	capacity = 6,
+  capacity = 6,
+  cooldown = 0
 }
 
 function entity_def:add_rails(amount)
@@ -47,41 +47,61 @@ function entity_def:take_rails(amount)
   return removed
 end
 
+function entity_def:craft_rail(dtime)
+  if self.cooldown <= 0 and self.cargo.rails < self.capacity then
+    if self.cargo.mat1_count < 1 or self.cargo.mat2_count < 1 then
+      local mats = unrailedtrain.take_materials(
+        self.parent,
+        1 - self.cargo.mat1_count,
+        1 - self.cargo.mat2_count
+      )
+      print(dump(mats))
+      if mats ~= nil then
+        self.cargo.mat1_count = self.cargo.mat1_count + mats.mat1
+        self.cargo.mat2_count = self.cargo.mat2_count + mats.mat2
+      end
+    end
+    if self.cargo.mat1_count >= 1 and self.cargo.mat2_count >= 1 then
+      self.add_rails(self, 1)
+      self.cargo.mat1_count = self.cargo.mat1_count - 1
+      self.cargo.mat2_count = self.cargo.mat2_count - 1
+      self.cooldown = unrailedtrain.crafting_cooldown
+    end
+  end
+  self.cooldown = self.cooldown - dtime
+end
 function entity_def:on_step(dtime)
-  unrailedtrain:on_cart_step(self, dtime)
+  if self.parent then
+    unrailedtrain:on_cart_step(self, dtime)
+    self:craft_rail(dtime)
+  end
 end
 
 function entity_def:on_activate(staticdata, dtime_s)
-	self.object:set_armor_groups({immortal=1, punch_operable=1})
+  self.object:set_armor_groups({immortal=1, punch_operable=1})
+  self.cooldown = 0
 	self.cargo = {
     rails = 0,
-    entities = {}
+    entities = {},
+    mat1_count = 0,
+    mat2_count = 0
 	}
 end
 
 function entity_def:on_rightclick(clicker)
-	local wielded_item = clicker:get_wielded_item()
-	if wielded_item and wielded_item:get_name() == "unrailedtrain:rail_stack" then
-    local added = self.add_rails(self, wielded_item:get_count())
-    wielded_item:set_count(wielded_item:get_count() - added)
-    clicker:set_wielded_item(wielded_item)
+  local wielded_item = clicker:get_wielded_item()
+  if wielded_item ~= nil and self.cargo.rails > 0 then
+    if wielded_item:get_name() == "" or wielded_item:get_name() == "unrailedtrain:rail_stack" then
+      local taken = self.take_rails(self, wielded_item:get_free_space())
+      local stack = ItemStack("unrailedtrain:rail_stack")
+      stack:set_count(wielded_item:get_count() + taken)
+      clicker:set_wielded_item(stack)
+    end
   end
 end
 
 function entity_def:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)
-  local wielded_item = puncher:get_wielded_item()
-  if wielded_item and wielded_item:get_name() == "" then
-    local taken = self.take_rails(self, 4)
-    local stack = ItemStack("unrailedtrain:rail_stack")
-    stack:set_count(taken)
-    puncher:set_wielded_item(stack)
-  elseif wielded_item and wielded_item:get_name() == "unrailedtrain:rail_stack" then
-    local taken = self.take_rails(self, 4 - wielded_item:get_count())
-    wielded_item:set_count(wielded_item:get_count() - taken)
-    puncher:set_wielded_item(wielded_item)
-  else
-    unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
-  end
+  unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
 end
 
 minetest.register_entity("unrailedtrain:rail_crafter", entity_def)
