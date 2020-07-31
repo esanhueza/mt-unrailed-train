@@ -15,7 +15,7 @@ local entity_def = {
 	capacity = 6,
 }
 
-function entity_def:add_rail(amount)
+function entity_def:add_rails(amount)
   if (self.capacity <= self.cargo.rails) then return 0 end
   local added = self.cargo.rails + amount <= self.capacity and amount or self.capacity - self.cargo.rails
   for i=1,added do
@@ -35,7 +35,7 @@ function entity_def:add_rail(amount)
   return added
 end
 
-function entity_def:remove_rails(amount)
+function entity_def:take_rails(amount)
   if amount <= 0 or self.cargo.rails == 0 then return 0 end
   local removed = self.cargo.rails >= amount and amount or self.cargo.rails
   for i=1,removed do
@@ -62,7 +62,7 @@ end
 function entity_def:on_rightclick(clicker)
 	local wielded_item = clicker:get_wielded_item()
 	if wielded_item and wielded_item:get_name() == "unrailedtrain:rail_stack" then
-    local added = self.add_rail(self, wielded_item:get_count())
+    local added = self.add_rails(self, wielded_item:get_count())
     wielded_item:set_count(wielded_item:get_count() - added)
     clicker:set_wielded_item(wielded_item)
   end
@@ -71,12 +71,12 @@ end
 function entity_def:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)
   local wielded_item = puncher:get_wielded_item()
   if wielded_item and wielded_item:get_name() == "" then
-    local taken = self.remove_rails(self, 4)
+    local taken = self.take_rails(self, 4)
     local stack = ItemStack("unrailedtrain:rail_stack")
     stack:set_count(taken)
     puncher:set_wielded_item(stack)
   elseif wielded_item and wielded_item:get_name() == "unrailedtrain:rail_stack" then
-    local taken = self.remove_rails(self, 4 - wielded_item:get_count())
+    local taken = self.take_rails(self, 4 - wielded_item:get_count())
     wielded_item:set_count(wielded_item:get_count() - taken)
     puncher:set_wielded_item(wielded_item)
   else
