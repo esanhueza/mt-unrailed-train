@@ -9,8 +9,11 @@ local biome_def = {
   depth_riverbed = 2,
   y_max = upper_limit,
   y_min = 6,
-  resources={
-    {chance=0.8,schematic=minetest.get_modpath("default").."/schematics/apple_tree.mts", offset_x=-3,offset_z=-3,offset_y=-1},
+  metals={
+    {chance=15, node="default:stone_with_iron"},
+  },
+  wood={
+    {chance=3,schematic=minetest.get_modpath("default").."/schematics/apple_tree.mts", offset_x=-3,offset_z=-3,offset_y=-1},
     {chance=0.05,schematic=minetest.get_modpath("default").."/schematics/bush.mts", offset_x=-1,offset_z=-1},
   },
   decorations={
@@ -41,16 +44,17 @@ local biome_def = {
 -- filler_noise
 -- stone_noise
 function biome_def:add_resources(parms)
-  self:add_forest(parms)
+  self:add_wood(parms)
+  self:add_metals(parms)
 end
 
-function biome_def:add_forest(parms)
+function biome_def:add_wood(parms)
   local nixz = 1
   for z=parms.conf.minp.z, parms.conf.maxp.z do
     for x=parms.conf.minp.x, parms.conf.maxp.x do
       if parms.surface[z][x].top > parms.surface[z][x].bot then
         if parms.stone_noise[nixz] * 5 < 2 then
-          unrailedtrain.map_generator.add_resource(x,parms.surface[z][x].top+1,z, parms, self.resources)
+          unrailedtrain.map_generator.add_resource(x,parms.surface[z][x].top+1,z, parms, self.wood)
         else
           unrailedtrain.map_generator.add_resource(x,parms.surface[z][x].top+1,z, parms, self.decorations)
         end
@@ -60,11 +64,13 @@ function biome_def:add_forest(parms)
   end
 end
 
-function biome_def:add_iron(parms)
+function biome_def:add_metals(parms)
   local nixz = 1
   for z=parms.conf.minp.z, parms.conf.maxp.z do
     for x=parms.conf.minp.x, parms.conf.maxp.x do
-      
+      if parms.surface[z][x].bot > parms.surface[z][x].top then
+        unrailedtrain.map_generator.add_resource(x,parms.surface[z][x].bot,z, parms, self.metals)
+      end
 			nixz=nixz+1
 		end
 	end

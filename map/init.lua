@@ -152,7 +152,8 @@ function unrailedtrain.map_generator.calc_biome_elements(biome, property)
 end
 
 function unrailedtrain.map_generator.calc_biome(biome)
-	unrailedtrain.map_generator.calc_biome_elements(biome, "resources")
+	unrailedtrain.map_generator.calc_biome_elements(biome, "metals")
+	unrailedtrain.map_generator.calc_biome_elements(biome, "wood")
 	unrailedtrain.map_generator.calc_biome_elements(biome, "decorations")
 end
 
