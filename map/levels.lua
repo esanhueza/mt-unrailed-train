@@ -9,7 +9,7 @@ unrailedtrain.levels = {
     },
     maxp     = {
       x      = -29950,
-      y      = 5020,
+      y      = 5050,
       z      = -29900
     },
     sealevel = 5002,
@@ -25,7 +25,7 @@ unrailedtrain.levels = {
     },
     maxp     = {
       x      = -29950,
-      y      = 5020,
+      y      = 5050,
       z      = -29800
     },
     sealevel = 5002,
@@ -41,7 +41,7 @@ unrailedtrain.levels = {
     },
     maxp     = {
       x      = -29950,
-      y      = 5020,
+      y      = 5050,
       z      = -29700
     },
     sealevel = 5002,

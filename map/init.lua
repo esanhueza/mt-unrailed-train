@@ -64,80 +64,51 @@ function unrailedtrain.map_generator.get_noise2d(noisename, seed, size2d, minpos
 	return noisemap
 end
 
-function unrailedtrain.map_generator.decorate(x,y,z, biome, parms)
-	local dec=biome.dec
-	if dec==nil then return end --no decorations!
+function unrailedtrain.map_generator.add_resource(x,y,z, parms, resources)
 	local area=parms.area
 	local data=parms.data
 	local vmparam2=parms.vmparam2
 	local d=1
 	local r=math.random()*100
-	--minetest.log("    r="..r)
-	--we will loop until we hit the end of the list, or an entry whose chancebot is <= r
-	--so when we exit we will be in one of these conditions
-	--dec[d]==nil (this biome had no decorations)
-	--r>=dec[d].chancetop (chance was too high, no decoration selected)
-	--r<dec[d].chancetop (d is the decoration that was selected)
-	while (dec[d]~=nil) and (r<dec[d].chancebot) do
-		--minetest.log("      d="..d.." chancetop="..luautils.var_or_nil(dec[d].chancetop).." chancebot="..luautils.var_or_nil(dec[d].chancebot))
+	print(dump(resources[d].chancebot))
+	while (resources[d]~=nil) and (r<resources[d].chancebot) do
 		d=d+1
 		end
-	--minetest.log("      d="..d.." chancetop="..luautils.var_or_nil(dec[d].chancetop).." chancebot="..luautils.var_or_nil(dec[d].chancebot))
-	if (dec[d]~=nil) and (r<dec[d].chancetop) then
-		--decorate
-		--minetest.log("      hit d="..d.." chancetop="..luautils.var_or_nil(dec[d].chancetop).." chancebot="..luautils.var_or_nil(dec[d].chancebot))
-
-		--deal with offest here, because we use it for all three decoration types
+	if (resources[d]~=nil) and (r<resources[d].chancetop) then
 		local px=x
 		local py=y
 		local pz=z
-		if dec[d].offset_x ~= nil then px=px+dec[d].offset_x end
-		if dec[d].offset_y ~= nil then py=py+dec[d].offset_y end
-		if dec[d].offset_z ~= nil then pz=pz+dec[d].offset_z end
-		--this is only used in type=node for right now
+		if resources[d].offset_x ~= nil then px=px+resources[d].offset_x end
+		if resources[d].offset_y ~= nil then py=py+resources[d].offset_y end
+		if resources[d].offset_z ~= nil then pz=pz+resources[d].offset_z end
 		local rotate=nil
-		if dec[d].rotate~=nil then
-			if type(dec[d].rotate)=="table" then rotate=dec[d].rotate[math.random(1,#dec[d].rotate)]
-			elseif dec[d].rotate=="random" then rotate=math.random(0,3)
-			elseif dec[d].rotate=="random3d" then rotate=math.random(0,11)
-			else rotate=dec[d].rotate
-			end --if dec[d].rotate==random
-		end --if dec[d].rotate~=nil
-		if dec[d].node~=nil then
-			--minetest.log("decorate:placing node="..dec[d].node.." biomename="..biome.name.." d="..d)
+		if resources[d].rotate~=nil then
+			if type(resources[d].rotate)=="table" then rotate=resources[d].rotate[math.random(1,#resources[d].rotate)]
+			elseif resources[d].rotate=="random" then rotate=math.random(0,3)
+			elseif resources[d].rotate=="random3d" then rotate=math.random(0,11)
+			else rotate=resources[d].rotate
+			end
+		end
+		if resources[d].node~=nil then
 			--note that rotate will be nil unless they sent a rotate value, and if it is nil, it will be ignored
-			placenode(px,py,pz,area,data,dec[d].node, vmparam2,rotate)
-			if dec[d].height~=nil then
-				local height_max=dec[d].height_max
-				if height_max==nil then height_max=dec[d].height end
-				local r=math.random(dec[d].height,height_max)
-				--minetest.log("heighttest-> height="..dec[d].height.." height_max="..height_max.." r="..r)
+			placenode(px,py,pz,area,data,resources[d].node, vmparam2,rotate)
+			if resources[d].height~=nil then
+				local height_max=resources[d].height_max
+				if height_max==nil then height_max=resources[d].height end
+				local r=math.random(resources[d].height,height_max)
 				for i=2,r do --start at 2 because we already placed 1
-					--minetest.log(" i="..i.." y-i+1="..(y-i)+1)
-					placenode(px,py+i-1,pz,area,data,dec[d].node, vmparam2,rotate)
-				end --for
-			end --if dec[d].node.height
-		elseif dec[d].func~=nil then
-			dec[d].func(px, py, pz, area, data)
-		elseif dec[d].schematic~=nil then
-			--minetest.log("  unrailedtrain.decorate-> schematic "..luautils.pos_to_str_xyz(x,y,z).." biome="..biome.name)
-			--placenode(x,y+1,z,area,data,c_mese)
-			--minetest.place_schematic({x=x,y=y,z=z}, dec[d].schema, "random", nil, true)
-			--minetest.place_schematic_on_vmanip(parms.vm,{x=x,y=y,z=z}, dec[d].schema, "random", nil, true)
-			--can't add schematics to the area properly, so they get added to the parms.mts table, then placed at the end just before the vm is saved
-			--I'm using offset instead of center so I dont have to worry about whether the schematic is a table or mts file
-			--I dont know how to send flags for mts file schematics, flags dont seem to be working well for me anyway
-			table.insert(parms.mts,{{x=px,y=py,z=pz},dec[d].schematic})
-		elseif dec[d].lsystem~=nil then
-			--minetest.spawn_tree({x=px,y=py,z=pz},dec[d].lsystem)
-			--cant add it here, so treating the same as schematic
-			table.insert(parms.lsys,{{x=px,y=py,z=pz},dec[d].lsys})
-		end --if dec[d].node~=nil
-	end --if (dec[d]~=nil)
-
-	--minetest.log("  unrailedtrain.decorate-> "..luautils.pos_to_str_xyz(x,y,z).." biome="..biome.name.." r="..r.." d="..d)
+					placenode(px,py+i-1,pz,area,data,resources[d].node, vmparam2,rotate)
+				end
+			end
+		elseif resources[d].func~=nil then
+			resources[d].func(px, py, pz, area, data)
+		elseif resources[d].schematic~=nil then
+			table.insert(parms.mts,{{x=px,y=py,z=pz},resources[d].schematic})
+		elseif resources[d].lsystem~=nil then
+			table.insert(parms.lsys,{{x=px,y=py,z=pz},resources[d].lsys})
+		end
+	end
 end
-
 
 function unrailedtrain.map_generator.get_content_id(nodename)
 	if nodename==nil or nodename=="" then return nil
@@ -147,42 +118,43 @@ function unrailedtrain.map_generator.get_content_id(nodename)
 	end --if
 end
 
-
-function unrailedtrain.map_generator.calc_biome_dec(biome)
-	--minetest.log("realms calc_biome_dec-> biome="..von(biome.name))
+function unrailedtrain.map_generator.calc_biome_elements(biome, property)
 	local d=1
-	if biome.dec~=nil then --there are decorations!
+	if biome[property]~=nil then --there are[property]orations!
 		--# gets the length of an array
-		--putting it in biome.dec.max is probably not really needed, but I find it easy to use and understand
-		biome.dec.max=#biome.dec
+		--putting it in biome[property].max is probably not really needed, but I find it easy to use and understand
+		biome[property].max=#biome[property]
 		local chancetop=0
 		local chancebot=0
-		--loop BACKWARDS from last decoration to first setting our chances.
+		--loop BACKWARDS from last[property]oration to first setting our chances.
 		--the point here is that we dont want to roll each chance individually.  We want to roll ONE chance,
-		--and then determine which decoration, if any, was selected.  So this process sets up the chancetop and chancebot
-		--for each dec element so that we can easily (and quickly) go through them when decorating.
-		--example:  dec[1].chance=3 gdec[2].chance=5 dec 3.chance=2
+		--and then determine which[property]oration, if any, was selected.  So this process sets up the chancetop and chancebot
+		--for each[property] element so that we can easily (and quickly) go through them when[property]orating.
+		--example: [property][1].chance=3 [property][2].chance=5[property] 3.chance=2
 		--after this runs
-		--dec[1].chancebot=7  dec[1].chancetop=9
-		--dec[2].chancebot=2  dec[2].chancetop=7
-		--dec[3].chancebot=0  dec[3].chancetop=2
-		for d=biome.dec.max, 1, -1 do
-			--minetest.log("realms calc_biome_dec->   decoration["..d.."] =")
-			luautils.log_table(biome.dec[d])
-			if biome.dec[d].chance~=nil then  --check this because intend to incorporate noise option in future.
+		--[property][1].chancebot=7 [property][1].chancetop=9
+		--[property][2].chancebot=2 [property][2].chancetop=7
+		--[property][3].chancebot=0 [property][3].chancetop=2
+		for d=biome[property].max, 1, -1 do
+			--minetest.log("realms calc_biome[property]->  [property]oration["..d.."] =")
+			luautils.log_table(biome[property][d])
+			if biome[property][d].chance~=nil then  --check this because intend to incorporate noise option in future.
 				chancebot=chancetop
-				chancetop=chancetop+biome.dec[d].chance
-				biome.dec[d].chancetop=chancetop
-				biome.dec[d].chancebot=chancebot
+				chancetop=chancetop+biome[property][d].chance
+				biome[property][d].chancetop=chancetop
+				biome[property][d].chancebot=chancebot
 				--turn node entries from strings into numbers
-				biome.dec[d].node=unrailedtrain.map_generator.get_content_id(biome.dec[d].node) --will return nil if passed nil
-				--minetest.log("realms calc_biome_dec->  content_id="..von(biome.dec[d].node))
+				biome[property][d].node=unrailedtrain.map_generator.get_content_id(biome[property][d].node) --will return nil if passed nil
+				--minetest.log("realms calc_biome->  content_id="..von(biome.dec[d].node))
 			end --if dec.chance~=nil
 		end --for d
-		--this is the default function for realms defined biomes, no need to have to specify it every time
-		if biome.decorate==nil then biome.decorate=unrailedtrain.decorate end
 	end --if biome.dec~=nil
-end --calc_biome_dec
+end
+
+function unrailedtrain.map_generator.calc_biome(biome)
+	unrailedtrain.map_generator.calc_biome_elements(biome, "resources")
+	unrailedtrain.map_generator.calc_biome_elements(biome, "decorations")
+end
 
 
 
@@ -197,7 +169,7 @@ function unrailedtrain.map_generator.add_decoration(biome,newdec)
 		end--for
 	--biome.dec[#biome.dec+1]=newdec
 	end --if
-	unrailedtrain.map_generator.calc_biome_dec(biome)
+	unrailedtrain.map_generator.calc_biome(biome)
 	--minetest.log("  add_decoration -> #biome.dec="..#biome.dec)
 end --add_decoration
 
@@ -277,7 +249,7 @@ function unrailedtrain.map_generator.register_biome(biome)
 	--will have to do the same thing for the dec.node entries, but we do that below
 
 	--now deal with the decorations (this is different from the way minetest does its biomes)
-	unrailedtrain.map_generator.calc_biome_dec(biome)
+	unrailedtrain.map_generator.calc_biome(biome)
 	minetest.log("realms-> biome registered for: "..biome.name)
 end
 
