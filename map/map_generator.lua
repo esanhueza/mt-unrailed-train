@@ -21,7 +21,9 @@ unrailedtrain.map_generator.register_noise("stone_map", {
 
 function unrailedtrain:generate_level(conf)
 	minetest.log("unrailedtrain generate_level-> =" .. conf.name)
-  local size2d = luautils.box_sizexz(conf.minp,conf.maxp)
+	local size2d = luautils.box_sizexz(conf.minp, conf.maxp)
+	size2d.y = size2d.y + 1
+	size2d.x = size2d.x + 1
   local minposxz = {x=conf.minp.x, y=conf.minp.z}
   local surface = {}
   local vmparam2 = {}
@@ -33,17 +35,15 @@ function unrailedtrain:generate_level(conf)
 		surface[z]={}
 		for x=conf.minp.x, conf.maxp.x do
 			surface[z][x]={}
-			print(x, z)
-			if terrain_noise[nixz] then
-				surface[z][x].top = conf.sealevel + math.floor(terrain_noise[nixz] * 5)
-				surface[z][x].bot = conf.sealevel + math.floor(stone_noise[nixz] * 5)
-			end
+			surface[z][x].top = conf.sealevel + math.floor(terrain_noise[nixz] * 5)
+			surface[z][x].bot = conf.sealevel + math.floor(stone_noise[nixz] * 5)			
 			nixz=nixz+1
 		end
 	end
   
-  local vm = minetest.get_voxel_manip(conf.minp, conf.maxp)
-  local area = VoxelArea:new{MinEdge=conf.minp, MaxEdge=conf.maxp}
+	local vm = minetest.get_voxel_manip()
+	local e1, e2 = vm:read_from_map(conf.minp, conf.maxp)
+  local area = VoxelArea:new{MinEdge=e1, MaxEdge=e2}
   local data = {}
 	vm:get_data(data)
 	vm:get_param2_data(vmparam2)
@@ -52,14 +52,17 @@ function unrailedtrain:generate_level(conf)
 		for y=conf.minp.y, conf.maxp.y do
       for x=conf.minp.x, conf.maxp.x do
         local sfc=surface[z][x]
-        local biome_def = unrailedtrain.map_generator.biome[conf.biome]
+				local biome_def = unrailedtrain.map_generator.biome[conf.biome]
+				--luautils.place_node(x,y,z, area, data, biome_def.node_stone)
         if y<sfc.bot then
           luautils.place_node(x,y,z, area, data, biome_def.node_stone)
-        elseif y<sfc.top and sfc.top >= sfc.bot then 
+        elseif y<sfc.top then 
           luautils.place_node(x,y,z, area, data, biome_def.node_filler)
-        elseif y==sfc.top and sfc.top >= sfc.bot then
+        elseif y==sfc.top then
           luautils.place_node(x,y,z, area, data, biome_def.node_top)
-          --if biome_def.decorate~=nil then biome_def.decorate(x,y+1,z, biome_def, conf) end
+					--if biome_def.decorate~=nil then biome_def.decorate(x,y+1,z, biome_def, conf) end
+				else
+          --luautils.place_node(x,y,z, area, data, "default:air")
         end
       end
     end
