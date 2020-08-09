@@ -19,7 +19,7 @@ unrailedtrain.map_generator.register_noise("stone_map", {
 })
 
 
-function unrailedtrain:remove_level(player, conf)
+function unrailedtrain:remove_map_level(conf)
 	local vm = minetest.get_voxel_manip()
 	local e1, e2 = vm:read_from_map(conf.minp, conf.maxp)
   local area = VoxelArea:new{MinEdge=e1, MaxEdge=e2}
@@ -42,7 +42,7 @@ function unrailedtrain:remove_level(player, conf)
 	minetest.log("unrailedtrain generate_level 'level removed'")
 end
 
-function unrailedtrain:generate_level(player, conf)
+function unrailedtrain:generate_map_level(conf)
 	local size2d = luautils.box_sizexz(conf.minp, conf.maxp)
   local minposxz = {x=conf.minp.x, y=conf.minp.z}
   local surface = {}
@@ -67,7 +67,6 @@ function unrailedtrain:generate_level(player, conf)
   local data = {}
 	vm:get_data(data)
 	vm:get_param2_data(vmparam2)
-
 
 	local biome = unrailedtrain.map_generator.biome[conf.biome]
 	for z=conf.minp.z, conf.maxp.z do
@@ -96,16 +95,28 @@ function unrailedtrain:generate_level(player, conf)
 		surface = surface,
 		filler_noise = filler_noise,
 		stone_noise = stone_noise,
-		player = player,
 		mts = mts,
 		lsys = lsys
 	})
 
   vm:set_data(data)
-	
+
 	for i = 1, #mts do
 		minetest.place_schematic_on_vmanip(vm, mts[i][1], mts[i][2], "random", nil, true)  --true means force replace other nodes
 	end
+
+	local rx = math.floor(conf.minp.x + 8 + math.random() * (conf.maxp.x - conf.minp.x + 8))
+	local rz = conf.maxp.z - 7
+	local ry = math.max(surface[rz][rx].top, surface[rz][rx].bot) - 1
+	print(rx, ry, rz)
+	minetest.place_schematic_on_vmanip(
+		vm,
+		{x=rx, y=ry, z=rz},
+		unrailedtrain.modpath.."/schematics/"..conf.station..".mts",
+		nil,
+		nil,
+		true
+	)
 	
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
@@ -113,6 +124,6 @@ function unrailedtrain:generate_level(player, conf)
 
 	for i = 1, #lsys do
 		minetest.spawn_tree(lsys[i][1],lsys[i][2])
-	end --for
+	end
 	minetest.log("unrailedtrain generate_level 'level generated'")
 end

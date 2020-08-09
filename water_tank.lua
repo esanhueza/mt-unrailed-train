@@ -1,6 +1,6 @@
 
 
-minetest.register_entity("unrailedtrain:water_tank", {
+minetest.register_entity("unrailedtrain:water_tank_1", {
 	initial_properties = {
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
 		visual = "mesh",
@@ -33,7 +33,7 @@ minetest.register_entity("unrailedtrain:water_tank", {
 })
 
 
-minetest.register_craftitem("unrailedtrain:water_tank", {
+minetest.register_craftitem("unrailedtrain:water_tank_1", {
 	description = "Water tank",
 	inventory_image = minetest.inventorycube("tnt_side.png", "tnt_side.png", "tnt_side.png"),
 	wield_image = "tnt_side.png",

@@ -29,7 +29,7 @@ minetest.register_chatcommand("remove", {
     
     for i,v in ipairs(unrailedtrain.levels) do
       if v.name == text then
-        unrailedtrain:remove_level(player, v)
+        unrailedtrain:remove_map_level(v)
         return
       end
     end

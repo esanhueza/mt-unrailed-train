@@ -70,7 +70,6 @@ function unrailedtrain.map_generator.add_resource(x,y,z, parms, resources)
 	local vmparam2=parms.vmparam2
 	local d=1
 	local r=math.random()*100
-	print(dump(resources[d].chancebot))
 	while (resources[d]~=nil) and (r<resources[d].chancebot) do
 		d=d+1
 		end
@@ -256,7 +255,6 @@ end
 
 
 
-dofile(unrailedtrain.modpath.."/map/levels.lua")
 dofile(unrailedtrain.modpath.."/map/biomes/grassland.lua")
 dofile(unrailedtrain.modpath.."/map/layer_barrier_generator.lua")
 dofile(unrailedtrain.modpath.."/map/map_generator.lua")

@@ -157,7 +157,7 @@ local entity_def = {
 		mesh = "train_1.b3d",
 		visual_size = {x=1, y=1},
 		textures = {"railers.png"},
-		static_save = true
+		static_save = false
 	},
 	old_dir = {x=0, y=0, z=0},
 	velocity = {x=0, y=0, z=0},
@@ -206,9 +206,9 @@ function entity_def:stop()
 	self.object:set_velocity({x=0, y=0, z=0})
 end
 
-minetest.register_entity("unrailedtrain:motor", entity_def)
+minetest.register_entity("unrailedtrain:motor_1", entity_def)
 
-minetest.register_craftitem("unrailedtrain:motor", {
+minetest.register_craftitem("unrailedtrain:motor_1", {
 	description = "Train motor",
 	wield_image = "dirt.png",
 	on_place = function(itemstack, placer, pointed_thing)
@@ -224,7 +224,7 @@ minetest.register_craftitem("unrailedtrain:motor", {
 		end
 
 		if node.name == "carts:rail" then
-			local obj =	minetest.add_entity(under, "unrailedtrain:motor")
+			local obj =	minetest.add_entity(under, "unrailedtrain:motor_1")
 			local entity = obj:get_luaentity()
 			entity.owner = placer
 			

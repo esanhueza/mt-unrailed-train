@@ -72,7 +72,7 @@ function entity_def:on_rightclick(clicker)
 			self.add_material1(self, item)
 			return
 		end
-		if string.match(item:get_name(), "_wood") or string.match(item:get_name(), "_tree") then
+		if string.match(item:get_name():lower(), "wood") or string.match(item:get_name():lower(), "tree") then
 			self.add_material2(self, item)
 			return
 		end
@@ -84,9 +84,9 @@ function entity_def:on_punch(puncher, time_from_last_punch, tool_capabilities, d
 	unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
 end
 
-minetest.register_entity("unrailedtrain:cargo_cart", entity_def)
+minetest.register_entity("unrailedtrain:cargo_cart_1", entity_def)
 
-minetest.register_craftitem("unrailedtrain:cargo_cart", {
+minetest.register_craftitem("unrailedtrain:cargo_cart_1", {
 	description = "Cargo cart",
 	inventory_image = minetest.inventorycube("carts_cart_top.png", "carts_cart_side.png", "carts_cart_side.png"),
 	wield_image = "carts_cart_side.png",

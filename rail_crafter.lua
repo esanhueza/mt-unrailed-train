@@ -4,7 +4,7 @@ local entity_def = {
 		visual = "mesh",
 		mesh = "cargo_cart_1.b3d",
 		textures = {"railers.png"},
-		static_save = true,
+		static_save = false,
 	},
 	old_pos = nil,
   old_dir = nil,
@@ -55,7 +55,6 @@ function entity_def:craft_rail(dtime)
         1 - self.cargo.mat1_count,
         1 - self.cargo.mat2_count
       )
-      print(dump(mats))
       if mats ~= nil then
         self.cargo.mat1_count = self.cargo.mat1_count + mats.mat1
         self.cargo.mat2_count = self.cargo.mat2_count + mats.mat2
@@ -104,9 +103,9 @@ function entity_def:on_punch(puncher, time_from_last_punch, tool_capabilities, d
   unrailedtrain:on_punch_on_cart(self, puncher, time_from_last_punch, tool_capabilities, direction)
 end
 
-minetest.register_entity("unrailedtrain:rail_crafter", entity_def)
+minetest.register_entity("unrailedtrain:rail_crafter_1", entity_def)
 
-minetest.register_craftitem("unrailedtrain:rail_crafter", {
+minetest.register_craftitem("unrailedtrain:rail_crafter_1", {
 	description = "Rails crafter",
 	inventory_image = minetest.inventorycube("carts_cart_top.png", "carts_cart_side.png", "carts_cart_side.png"),
 	wield_image = "carts_cart_side.png",
