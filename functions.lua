@@ -168,7 +168,7 @@ function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_pun
     end
 
     -- Add a replacement cart to the world
-    minetest.add_item(cart_entity.object:get_pos(), leftover)
+    minetest.add_item(cart_entity.object:get_pos())
     unrailedtrain:detach_cart(cart_entity.parent, cart_entity)
     cart_entity.object:remove()
 		return
