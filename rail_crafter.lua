@@ -71,14 +71,22 @@ function entity_def:craft_rail(dtime)
 end
 function entity_def:on_step(dtime)
   if self.parent then
-    unrailedtrain:on_cart_step(self, dtime)
+    if self.parent.running then
+      unrailedtrain:cart_move(self, dtime)
+    end
     self:craft_rail(dtime)
   end
+end
+
+function entity_def:stop()
+	self.object:set_acceleration({x=0, y=0, z=0})
+	self.object:set_velocity({x=0, y=0, z=0})
 end
 
 function entity_def:on_activate(staticdata, dtime_s)
   self.object:set_armor_groups({immortal=1, punch_operable=1})
   self.cooldown = 0
+	self.old_pos = self.object:get_pos()
 	self.cargo = {
     rails = 0,
     entities = {},

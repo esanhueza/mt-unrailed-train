@@ -109,7 +109,7 @@ minetest.register_craftitem("unrailedtrain:rail_stack", rail_stack_item_def)
 
 
 minetest.override_item("carts:rail", {
-	groups = { dig_immediate = 2 },
+	groups = { dig_immediate = 2, rail = 1 },
 	drop = {
 		max_items = 1,
 		items = {

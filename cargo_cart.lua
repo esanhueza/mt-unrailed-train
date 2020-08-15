@@ -8,7 +8,7 @@ local entity_def = {
 		static_save = false,
 	},
 	old_pos = nil,
-  old_dir = nil,
+	old_dir = {x=0, y=0, z=0},
 	railtype = nil,
   parent = nil,
 	owner = nil,
@@ -50,13 +50,18 @@ end
 
 function entity_def:on_step(dtime)
 	if self.parent ~= nil and self.parent.running then
-		self.object:set_velocity(self.parent.object:get_velocity())
-		self.old_dir = vector.normalize(self.object:get_velocity())
+		unrailedtrain:cart_move(self, dtime)
 	end
+end
+
+function entity_def:stop()
+	self.object:set_acceleration({x=0, y=0, z=0})
+	self.object:set_velocity({x=0, y=0, z=0})
 end
 
 function entity_def:on_activate(staticdata, dtime_s)
 	self.object:set_armor_groups({immortal=1})
+	self.old_pos = self.object:get_pos()
 	self.cargo = {
 		mat1_count = 0,
 		mat2_count = 0,

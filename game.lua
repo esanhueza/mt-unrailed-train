@@ -8,23 +8,49 @@ unrailedtrain.game = {
   map_length = 100,
   map_width = 50,
   map_height = 50,
-  sessions = {
-    {
-      player = "player1", -- player name
-      game_time = 300, -- seconds
-      carts = {
-        "train_1", -- entity's name
-        "cargo_cart_1"
-      },
-      level = 1, -- level_index
-      position = {x=0, y=0, z=0} -- position of the last station reached
-    }
-  }
+  session = nil,
 }
 
-function unrailedtrain:find_player_session(player_name)
-  for i,v in ipairs(unrailedtrain.game.sessions) do
-    if v.player == player_name then
+function unrailedtrain:start_game(player)
+  if unrailedtrain.session.train ~= nil then
+    unrailedtrain.session.train:start()
+  end
+end
+
+function unrailedtrain:generate_game(player)
+  if unrailedtrain.session == nil then
+    self:register_player(player:get_player_name())
+    local level = self:find_level("level_1")
+    if level == nil then
+      minetest.log("'Level 1 not found'")
+      return
+    end
+    unrailedtrain.session.current_level = level
+    self:generate_level(player, level, true)
+
+    -- spawn train
+    local entity = unrailedtrain:place_train(player, {
+      x=level.last_rail_pos.x,
+      y=level.last_rail_pos.y,
+      z=level.last_rail_pos.z + 6
+    }, {
+      x=0,
+      y=0,
+      z=1
+    })
+    
+    for i,v in ipairs(unrailedtrain.basic_carts) do
+      local cart_obj = minetest.add_entity(level.last_rail_pos, v)
+      unrailedtrain:attach_cart(entity, 1, cart_obj:get_luaentity())
+    end
+    -- teleport player to level
+    player:set_pos(level.last_rail_pos)
+	end
+end
+
+function unrailedtrain:find_level(name)
+  for i,v in ipairs(unrailedtrain.levels) do
+    if string.match(v.name, name) then
       return v
     end
   end
@@ -44,15 +70,11 @@ function unrailedtrain:find_next_level(player_name)
 end
 
 function unrailedtrain:register_player(player_name)
-  table.insert( unrailedtrain.sessions, {
-    player = player_name,
-    game_time = 0,
-    carts = {
-      "train_1",
-      "cargo_cart_1",
-      "rail_crafter_1"
-    },
-    level = 1,
+  unrailedtrain.session = {
+    player_name = player_name,
+    current_level = nil,
+    carts = {},
+    train = nil,
     position = {x=0, y=0, z=0}
-  })
+  }
 end

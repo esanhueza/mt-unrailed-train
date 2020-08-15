@@ -50,13 +50,20 @@ function unrailedtrain:generate_map_level(conf)
 	local nixz=1
 	local filler_noise = unrailedtrain.map_generator.get_noise2d("filler_map", conf.seed, size2d, minposxz)
 	local stone_noise = unrailedtrain.map_generator.get_noise2d("stone_map", conf.seed, size2d, minposxz)
-	
+	local station_pos = {
+		x = math.floor(conf.minp.x + 8 + math.random() * (conf.maxp.x - conf.minp.x - 8)),
+		z = conf.maxp.z - 6
+	}
+
   for z=conf.minp.z, conf.maxp.z do
 		surface[z]={}
 		for x=conf.minp.x, conf.maxp.x do
 			surface[z][x]={}
 			surface[z][x].top = conf.sealevel + math.floor(filler_noise[nixz] * 5)
 			surface[z][x].bot = conf.sealevel + math.floor(stone_noise[nixz] * 5)
+			if luautils.distance2d(x, z, station_pos.x, station_pos.z, 1) < 10 or luautils.distance2d(x, z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) < 10 then
+				surface[z][x].bot = conf.sealevel
+			end
 			nixz=nixz+1
 		end
 	end
@@ -102,16 +109,15 @@ function unrailedtrain:generate_map_level(conf)
   vm:set_data(data)
 
 	for i = 1, #mts do
-		minetest.place_schematic_on_vmanip(vm, mts[i][1], mts[i][2], "random", nil, true)  --true means force replace other nodes
+		if luautils.distance2d(mts[i][1].x, mts[i][1].z, station_pos.x, station_pos.z, 1) >= 10 or luautils.distance2d(mts[i][1].x, mts[i][1].z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) >= 10 then
+			minetest.place_schematic_on_vmanip(vm, mts[i][1], mts[i][2], "random", nil, true)  --true means force replace other nodes
+		end
 	end
 
-	local rx = math.floor(conf.minp.x + 8 + math.random() * (conf.maxp.x - conf.minp.x + 8))
-	local rz = conf.maxp.z - 7
-	local ry = math.max(surface[rz][rx].top, surface[rz][rx].bot) - 1
-	print(rx, ry, rz)
+	station_pos.y = math.max(surface[station_pos.z][station_pos.x].top, surface[station_pos.z][station_pos.x].bot)
 	minetest.place_schematic_on_vmanip(
 		vm,
-		{x=rx, y=ry, z=rz},
+		station_pos,
 		unrailedtrain.modpath.."/schematics/"..conf.station..".mts",
 		nil,
 		nil,
@@ -123,7 +129,14 @@ function unrailedtrain:generate_map_level(conf)
 	vm:write_to_map()
 
 	for i = 1, #lsys do
-		minetest.spawn_tree(lsys[i][1],lsys[i][2])
+		if luautils.distance2d(lsys[i][1].x, lsys[i][1].z, station_pos.x, station_pos.z, 1) >= 10 or luautils.distance2d(lsys[i][1].x, lsys[i][1].z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) >= 10 then
+			minetest.spawn_tree(lsys[i][1],lsys[i][2])
+		end
 	end
 	minetest.log("unrailedtrain generate_level 'level generated'")
+
+	return {
+		station_position = station_pos,
+		surface = surface
+	}
 end

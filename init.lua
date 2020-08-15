@@ -3,10 +3,9 @@ unrailedtrain = {}
 unrailedtrain.modpath = minetest.get_modpath("unrailedtrain")
 
 -- Maximal speed of the cart in m/s (min = -1)
-unrailedtrain.speed_max = 0.15
+unrailedtrain.speed_max = 0.4 -- 0.15
 unrailedtrain.acceleration = 0.01
 unrailedtrain.crafting_cooldown = 5
-unrailedtrain.trains = {}
 unrailedtrain.levels = {}
 unrailedtrain.groups = {
 	carts = { 
@@ -15,13 +14,28 @@ unrailedtrain.groups = {
 		"unrailedtrain:water_tank_1"
 	 },
 }
+unrailedtrain.basic_train = "unrailedtrain:motor_1"
+unrailedtrain.basic_carts = {
+	"unrailedtrain:cargo_cart_1",
+	"unrailedtrain:rail_crafter_1"
+}
 
-function unrailedtrain:generate_level(player, level)
+function unrailedtrain:generate_level(player, level, add_rails)
+	if add_rails then
+		level.last_rail_pos = {
+			x = math.floor(level.minp.x + 12 + math.random() * (level.maxp.x - level.minp.x - 12)),
+			z = level.minp.z
+		}
+	end
 	-- generate map
-	unrailedtrain:generate_map_level(level)
-	-- spawn initial station
-	-- spawn train
-	-- teleport player to level
+	local data = unrailedtrain:generate_map_level(level)
+	if add_rails then
+		level.last_rail_pos.y = math.max(data.surface[level.last_rail_pos.z + 1][level.last_rail_pos.x].top, data.surface[level.last_rail_pos.z + 1][level.last_rail_pos.x].bot) + 1
+		for i=0,12 do
+			local ry = data.surface[level.last_rail_pos.z + i][level.last_rail_pos.x].top + 1
+			minetest.set_node({x=level.last_rail_pos.x, y=ry, z=level.last_rail_pos.z + i}, {name="carts:rail"})
+		end
+	end 
 end
 
 function unrailedtrain:register_level(level_def)
