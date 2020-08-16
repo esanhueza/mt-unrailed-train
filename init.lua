@@ -7,6 +7,7 @@ unrailedtrain.speed_max = 0.4 -- 0.15
 unrailedtrain.acceleration = 0.01
 unrailedtrain.crafting_cooldown = 5
 unrailedtrain.levels = {}
+unrailedtrain.session = {}
 unrailedtrain.groups = {
 	carts = { 
 		"unrailedtrain:cargo_cart_1",
@@ -60,17 +61,23 @@ function unrailedtrain:register_level(level_def)
 end
 
 function unrailedtrain:add_train(train)
+	unrailedtrain.session.train = train
+	--[[
   local index = table.find_index(self.trains, train)
   if index == nil then
 		table.insert(self.trains, train)
 	end
+	]]--
 end
 
 function unrailedtrain:remove_train(train)
+	unrailedtrain.session.train = nil
+	--[[
   local index = table.find_index(self.trains, train)
   if index ~= nil then
 		table.remove(self.trains, index)
 	end
+	]] --
 end
 
 dofile(unrailedtrain.modpath.."/functions.lua")

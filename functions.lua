@@ -257,7 +257,7 @@ function unrailedtrain:attach_cart(motor, cart_pos, cart)
   end
 end
 
-function unrailedtrain:place_train(player, position, direction)
+function unrailedtrain:place_train(player, position)
   -- use cart as tool
   local node = minetest.get_node(position)
   if node.name == "carts:rail" then
@@ -265,10 +265,11 @@ function unrailedtrain:place_train(player, position, direction)
     local entity = obj:get_luaentity()
     entity.owner = player
     
-    local trail_pos = unrailedtrain:find_next_free_trail(position, vector.multiply(direction, -1))
-    local trail_dir = vector.direction(position, trail_pos)
-    entity.old_dir = direction
-    local yaw = vector.angle({x=0, y=0, z=1}, trail_dir)
+    local dir = carts:get_rail_direction(
+      position, {x=0, y=0, z=1}, nil, nil, nil
+    )
+    entity.old_dir = vector.round(dir)
+    local yaw = vector.angle({x=0, y=0, z=1}, entity.old_dir)
     entity.object:set_yaw(yaw)
     -- unrailedtrain:add_train(entity)
     unrailedtrain.session.train = entity
@@ -342,17 +343,23 @@ function unrailedtrain:on_punch_on_motor(entity, puncher, time_from_last_punch, 
     entity.object:remove()
 		return
   end
-  
+
   -- change train direction
   if not vector.equals(entity.old_dir, {x=0, y=0, z=0}) then
-    entity.old_dir = vector.multiply(entity.old_dir, -1)
-  else
-    local d = find_previous_trail_pos(entity.object:get_pos(), nil)
-    if d then
-      entity.old_dir = vector.add(d, vector.multiply(entity.object:get_pos(), -1))
+    local sign = 1
+    local dir = entity.old_dir
+    dir = vector.multiply(dir, -1)
+    dir.y = entity.old_dir.y
+    if dir.x ~= 0 then
+      sign = math.sign(dir.x)
     end
+    entity.old_dir = dir
+    entity.object:set_yaw(sign * vector.angle({x=0,y=0,z=1}, entity.old_dir))
+  else
+    entity.old_dir = carts:get_rail_direction(entity.object:get_pos(), vector.round(direction), nil, nil, nil)
+    entity.object:set_yaw(vector.angle({x=0,y=0,z=1}, entity.old_dir))
   end
-  set_entity_yaw(entity)
+  
 end
 
 function unrailedtrain:take_materials(amount1, amount2)

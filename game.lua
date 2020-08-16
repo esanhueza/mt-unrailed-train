@@ -8,7 +8,6 @@ unrailedtrain.game = {
   map_length = 100,
   map_width = 50,
   map_height = 50,
-  session = nil,
 }
 
 function unrailedtrain:start_game(player)

@@ -82,7 +82,7 @@ minetest.register_craftitem("unrailedtrain:motor_1", {
 		end
 
 		if node.name == "carts:rail" then
-			unrailedtrain:place_train(placer, under, placer:get_look_dir())
+			unrailedtrain:place_train(placer, under)
 		end
 	end,
 })
