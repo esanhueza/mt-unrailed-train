@@ -34,11 +34,10 @@ function unrailedtrain:cart_move(cart, dtime)
 	local dir = carts:get_rail_direction(
 		pos, cart_dir, nil, nil, cart.railtype
   )
-
 	local dir_changed = not vector.equals(dir, cart.old_dir)
 
   if dir_changed then
-    -- Rnd of rail
+    -- End of rail
     if vector.equals(dir, vector.multiply(cart.old_dir, -1)) then
       cart.dir = cart.old_dir
       cart:stop()
@@ -106,18 +105,27 @@ function unrailedtrain:cart_move(cart, dtime)
 		cart.old_dir = vector.new(dir)
 	end
 
-	if cart.old_dir.x ~= 0 then
-		cart.object:set_yaw(-carts:get_sign(dir.x) * vector.angle({x=0, y=0, z=1}, dir))
+  local rotation = {x=0,y=0,z=0}
+  if dir.y ~= 0 then
+    -- TODO: implement a better version of this.
+    -- maybe do it with an animation 
+    -- rotation.x = math.sign(dir.y) * math.pi/4
+  end
+  
+  if dir.x ~= 0 then
+    rotation.y = -carts:get_sign(dir.x) * vector.angle_y({x=0, y=0, z=1}, dir)
 	end
-	if cart.old_dir.z ~= 0 then
-		cart.object:set_yaw(carts:get_sign(dir.z) * vector.angle({x=0, y=0, z=1}, dir))
-	end
+	if dir.z ~= 0 then
+    rotation.y = carts:get_sign(dir.z) * vector.angle_y({x=0, y=0, z=1}, dir)
+  end
+  
+  cart.object:set_rotation(rotation)
 	
 	if update.vel then
 		cart.object:set_velocity(vel)
 	end
 	if update.pos then
-		if dir_changed then
+    if dir_changed then
 			cart.object:set_pos(pos)
 		else
 			cart.object:move_to(pos)

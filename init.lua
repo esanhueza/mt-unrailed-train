@@ -80,6 +80,7 @@ function unrailedtrain:remove_train(train)
 	]] --
 end
 
+dofile(unrailedtrain.modpath.."/utils.lua")
 dofile(unrailedtrain.modpath.."/functions.lua")
 dofile(unrailedtrain.modpath.."/items.lua")
 dofile(unrailedtrain.modpath.."/rails.lua")

@@ -1,3 +1,7 @@
+function vector.angle_y(v1, v2)
+  return vector.angle(v1, {x=v2.x, y=0, z=v2.z})
+end
+
 function table.find(t, l)
   for _, v in ipairs(t) do
     if l == v then

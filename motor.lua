@@ -31,8 +31,9 @@ function entity_def:on_rightclick(clicker)
 	local is_cart = table.find(unrailedtrain.groups.carts, item:get_name())
 	if not is_cart then
 		return
-	end 
-	unrailedtrain:attach_cart(self, 1, item)
+	end
+	local cart_obj = minetest.add_entity(self.object:get_pos(), item:get_name())
+	unrailedtrain:attach_cart(self, 1, cart_obj:get_luaentity())
 end
 	
 function entity_def:on_activate (staticdata, dtime_s) 
