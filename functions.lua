@@ -38,6 +38,7 @@ function unrailedtrain:cart_move(cart, dtime)
 	local dir_changed = not vector.equals(dir, cart.old_dir)
 
   if dir_changed then
+    -- Rnd of rail
     if vector.equals(dir, vector.multiply(cart.old_dir, -1)) then
       cart.dir = cart.old_dir
       cart:stop()
@@ -129,18 +130,6 @@ local function get_railparams(pos)
 	return carts.railparams[node.name] or {}
 end
 
-local function set_entity_yaw(self)
-	local yaw = 0
-	if self.old_dir.x < 0 then
-		yaw = 0.5
-	elseif self.old_dir.x > 0 then
-		yaw = 1.5
-	elseif self.old_dir.z < 0 then
-		yaw = 1
-	end
-	self.object:set_yaw(yaw * math.pi)
-end
-
 function unrailedtrain:find_next_free_trail(pos, dir)
   local t = {
     vector.add(pos, {x=-1, y=0, z=0}),
@@ -158,47 +147,6 @@ function unrailedtrain:find_next_free_trail(pos, dir)
     end
   end
   return nil
-end
-
-function table.find(t, l)
-  for _, v in ipairs(t) do
-    if l == v then
-      return v
-    end
-  end
-  return nil
-end
-
-function table.find_index(t, l)
-  for i, v in ipairs(t) do
-    if l == v then
-      return i
-    end
-  end
-  return nil
-end
-
-function table.last (self)
-  local last = nil
-  for _, k in pairs(self) do
-      last = k
-  end
-  return last
-end
-
-function table.length (self)
-  local i = 0
-  for j, _ in pairs(self) do
-      i = j
-  end
-  return i
-end
-
-function table.empty (self)
-  for _, _ in pairs(self) do
-      return false
-  end
-  return true
 end
 
 function unrailedtrain:on_rightclick_over_cart(cart_clicked, clicker)
