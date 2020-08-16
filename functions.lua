@@ -33,18 +33,16 @@ function unrailedtrain:cart_move(cart, dtime)
 
 	local dir = carts:get_rail_direction(
 		pos, cart_dir, nil, nil, cart.railtype
-	)
+  )
+
 	local dir_changed = not vector.equals(dir, cart.old_dir)
 
-	if dir_changed then
-		for _, v in pairs({"x","y","z"}) do
-			-- End of the rail
-      if dir[v] ~= 0 and math.abs(dir[v]) == math.abs(cart.old_dir[v]) then
-				cart:stop()
-				cart.dir = cart.old_dir
-				return
-			end
-		end
+  if dir_changed then
+    if vector.equals(dir, vector.multiply(cart.old_dir, -1)) then
+      cart.dir = cart.old_dir
+      cart:stop()
+      return
+    end
 	end
 
 	local new_acc = {x=0, y=0, z=0}
