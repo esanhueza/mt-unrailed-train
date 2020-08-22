@@ -18,6 +18,12 @@ local entity_def = {
 function entity_def:on_step(dtime)
 	if self.running then
 		unrailedtrain:cart_move(self, dtime)
+		local node_under = minetest.get_node(self.old_pos)
+		if node_under.name == "carts:rail" then
+			print("swapping")
+			print(dump(self.old_pos))
+			minetest.set_node(self.old_pos, {name="unrailedtrain:indestructible_rail"})
+		end
 	end
 end
 

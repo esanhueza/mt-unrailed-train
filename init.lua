@@ -34,7 +34,7 @@ function unrailedtrain:generate_level(player, level, add_rails)
 		level.last_rail_pos.y = math.max(data.surface[level.last_rail_pos.z + 1][level.last_rail_pos.x].top, data.surface[level.last_rail_pos.z + 1][level.last_rail_pos.x].bot) + 1
 		for i=0,12 do
 			local ry = data.surface[level.last_rail_pos.z + i][level.last_rail_pos.x].top + 1
-			minetest.set_node({x=level.last_rail_pos.x, y=ry, z=level.last_rail_pos.z + i}, {name="carts:rail"})
+			minetest.set_node({x=level.last_rail_pos.x, y=ry, z=level.last_rail_pos.z + i}, {name="unrailedtrain:indestructible_rail"})
 		end
 	end 
 end

@@ -109,7 +109,7 @@ minetest.register_craftitem("unrailedtrain:rail_stack", rail_stack_item_def)
 
 
 minetest.override_item("carts:rail", {
-	groups = { dig_immediate = 2, rail = 1 },
+	groups = { dig_immediate = 3, rail = 1 },
 	drop = {
 		max_items = 1,
 		items = {
@@ -119,4 +119,21 @@ minetest.override_item("carts:rail", {
 			}
 		}
 	},
+})
+
+carts:register_rail("unrailedtrain:indestructible_rail", {
+	description = "Indestructible Rail",
+	tiles = {
+		"carts_rail_straight.png", "carts_rail_curved.png",
+		"carts_rail_t_junction.png", "carts_rail_crossing.png"
+	},
+	groups = carts:get_rail_groups(),
+	inventory_image = "carts_rail_straight.png",
+	wield_image = "carts_rail_straight.png",
+	is_ground_content = false,
+	on_blast = function() end,
+	on_destruct = function () end,
+	can_dig = function() return false end,
+	diggable = false,
+	drop = "",
 })
