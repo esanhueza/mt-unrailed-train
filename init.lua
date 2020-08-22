@@ -14,6 +14,10 @@ unrailedtrain.groups = {
 		"unrailedtrain:rail_crafter_1",
 		"unrailedtrain:water_tank_1"
 	 },
+	 rails = {
+		 "unrailedtrain:indestructible_rail",
+		 "crats:rail"
+	 }
 }
 unrailedtrain.basic_train = "unrailedtrain:motor_1"
 unrailedtrain.basic_carts = {

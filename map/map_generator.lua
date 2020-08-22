@@ -109,7 +109,7 @@ function unrailedtrain:generate_map_level(conf)
   vm:set_data(data)
 
 	for i = 1, #mts do
-		if luautils.distance2d(mts[i][1].x, mts[i][1].z, station_pos.x, station_pos.z, 1) >= 10 or luautils.distance2d(mts[i][1].x, mts[i][1].z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) >= 10 then
+		if luautils.distance2d(mts[i][1].x, mts[i][1].z, station_pos.x, station_pos.z, 1) >= 10 and luautils.distance2d(mts[i][1].x, mts[i][1].z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) >= 10 then
 			minetest.place_schematic_on_vmanip(vm, mts[i][1], mts[i][2], "random", nil, true)  --true means force replace other nodes
 		end
 	end
@@ -129,7 +129,7 @@ function unrailedtrain:generate_map_level(conf)
 	vm:write_to_map()
 
 	for i = 1, #lsys do
-		if luautils.distance2d(lsys[i][1].x, lsys[i][1].z, station_pos.x, station_pos.z, 1) >= 10 or luautils.distance2d(lsys[i][1].x, lsys[i][1].z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) >= 10 then
+		if luautils.distance2d(lsys[i][1].x, lsys[i][1].z, station_pos.x, station_pos.z, 1) >= 10 and luautils.distance2d(lsys[i][1].x, lsys[i][1].z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) >= 15 then
 			minetest.spawn_tree(lsys[i][1],lsys[i][2])
 		end
 	end

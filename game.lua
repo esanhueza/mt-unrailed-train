@@ -17,34 +17,33 @@ function unrailedtrain:start_game(player)
 end
 
 function unrailedtrain:generate_game(player)
-  if unrailedtrain.session == nil then
-    self:register_player(player:get_player_name())
-    local level = self:find_level("level_1")
-    if level == nil then
-      minetest.log("'Level 1 not found'")
-      return
-    end
-    unrailedtrain.session.current_level = level
-    self:generate_level(player, level, true)
+  self:register_player(player:get_player_name())
+  local level = self:find_level("level_1")
+  if level == nil then
+    minetest.log("'Level 1 not found'")
+    return
+  end
+  unrailedtrain.session.current_level = level
+  self:generate_level(player, level, true)
 
-    -- spawn train
-    local entity = unrailedtrain:place_train(player, {
-      x=level.last_rail_pos.x,
-      y=level.last_rail_pos.y,
-      z=level.last_rail_pos.z + 6
-    }, {
-      x=0,
-      y=0,
-      z=1
-    })
-    
-    for i,v in ipairs(unrailedtrain.basic_carts) do
-      local cart_obj = minetest.add_entity(level.last_rail_pos, v)
-      unrailedtrain:attach_cart(entity, 1, cart_obj:get_luaentity())
-    end
-    -- teleport player to level
-    player:set_pos(level.last_rail_pos)
-	end
+
+  -- spawn train
+  local entity = unrailedtrain:place_train(player, {
+    x=level.last_rail_pos.x,
+    y=level.last_rail_pos.y,
+    z=level.last_rail_pos.z + 6
+  }, {
+    x=0,
+    y=0,
+    z=1
+  })
+  
+  for i,v in ipairs(unrailedtrain.basic_carts) do
+    local cart_obj = minetest.add_entity(level.last_rail_pos, v)
+    unrailedtrain:attach_cart(entity, 1, cart_obj:get_luaentity())
+  end
+  -- teleport player to level
+  player:set_pos(level.last_rail_pos)
 end
 
 function unrailedtrain:find_level(name)

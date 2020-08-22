@@ -154,7 +154,7 @@ function unrailedtrain:find_next_free_trail(pos, dir)
   for _, v in ipairs(t) do
     if dir == nil or (dir ~= nil and not vector.equals(v, vector.add(pos, dir))) then
       local node = minetest.get_node(v)
-      if node ~= nil and node.name == "carts:rail"  then
+      if node ~= nil and node.name == "carts:rail" or node.name == "unrailedtrain:indestructible_rail"  then
         return v
       end
     end
@@ -191,7 +191,6 @@ function unrailedtrain:attach_cart(motor, cart_pos, cart)
     vector.round(table.last(motor.carts).object:get_pos()), 
     dir
   )
-  
   if new_pos and last_available_pos then
     for i, c in ipairs(motor.carts) do
       if i > cart_pos then
@@ -219,7 +218,7 @@ end
 function unrailedtrain:place_train(player, position)
   -- use cart as tool
   local node = minetest.get_node(position)
-  if node.name == "carts:rail" then
+  if node.name == "carts:rail" or node.name == "unrailedtrain:indestructible_rail" then
     local obj =	minetest.add_entity(position, "unrailedtrain:motor_1")
     local entity = obj:get_luaentity()
     entity.owner = player
@@ -260,7 +259,6 @@ function unrailedtrain:detach_cart(motor, cart)
 end
 
 function unrailedtrain:on_punch_on_cart(cart_entity, puncher, time_from_last_punch, tool_capabilities, direction)
-  print(dump(cart_entity))
   -- Player digs cart by sneak-punch
 	if puncher:get_player_control().sneak then
 		if cart_entity.sound_handle then
