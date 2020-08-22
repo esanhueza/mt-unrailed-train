@@ -106,19 +106,24 @@ function unrailedtrain:cart_move(cart, dtime)
 	end
 
   local rotation = {x=0,y=0,z=0}
-  if dir.y ~= 0 then
-    -- TODO: implement a better version of this.
-    -- maybe do it with an animation 
-    -- rotation.x = math.sign(dir.y) * math.pi/4
-  end
-  
+  local bone_pos = {x=0, y=0, z=0}
   if dir.x ~= 0 then
+    bone_pos.x = -4.5 * carts:get_sign(dir.y)
     rotation.y = -carts:get_sign(dir.x) * vector.angle_y({x=0, y=0, z=1}, dir)
 	end
 	if dir.z ~= 0 then
+    bone_pos.z = -4.5 * carts:get_sign(dir.y)
     rotation.y = carts:get_sign(dir.z) * vector.angle_y({x=0, y=0, z=1}, dir)
   end
-  
+  if dir.y ~= 0 then
+    bone_pos.y = 2.5
+  end
+
+  cart.object:set_bone_position("Bone", bone_pos, {
+    x=carts:get_sign(dir.y) * 45 * -1,
+    y=0,
+    z=0,
+  })
   cart.object:set_rotation(rotation)
 	
 	if update.vel then
