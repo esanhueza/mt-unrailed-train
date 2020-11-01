@@ -215,13 +215,12 @@ function unrailedtrain:attach_cart(motor, cart_pos, cart)
   end
 end
 
-function unrailedtrain:place_train(player, position)
+function unrailedtrain:place_train(position)
   -- use cart as tool
   local node = minetest.get_node(position)
   if node.name == "carts:rail" or node.name == "unrailedtrain:indestructible_rail" then
     local obj =	minetest.add_entity(position, "unrailedtrain:motor_1")
     local entity = obj:get_luaentity()
-    entity.owner = player
     
     local dir = carts:get_rail_direction(
       position, {x=0, y=0, z=1}, nil, nil, nil

@@ -20,9 +20,9 @@ function table.find_index(t, l)
   return nil
 end
 
-function table.last (self)
+function table.last (t)
   local last = nil
-  for _, k in pairs(self) do
+  for _, k in pairs(t) do
       last = k
   end
   return last

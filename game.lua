@@ -11,39 +11,52 @@ unrailedtrain.game = {
 }
 
 function unrailedtrain:start_game(player)
-  if unrailedtrain.session.train ~= nil then
-    unrailedtrain.session.train:start()
+  local lobby = private_lobby.find_player_lobby(player:get_player_name())
+  if not lobby then
+    return
+  end
+
+  local session = unrailedtrain:register_session(lobby)
+  local level = unrailedtrain:generate_map(lobby)
+
+  for i,player_name in ipairs(session.lobby.players) do
+    local p = minetest.get_player_by_name(player_name)
+    p:set_pos(level.last_rail_pos)
   end
 end
 
-function unrailedtrain:generate_game(player)
-  self:register_player(player:get_player_name())
-  local level = self:find_level("level_1")
-  if level == nil then
+function unrailedtrain:generate_map(session)
+  local level_conf = unrailedtrain:find_level("level_1")
+  if level_conf == nil then
     minetest.log("'Level 1 not found'")
     return
   end
-  unrailedtrain.session.current_level = level
-  self:generate_level(player, level, true)
 
+  local level = unrailedtrain:generate_level(level_conf, true)
 
   -- spawn train
-  local entity = unrailedtrain:place_train(player, {
-    x=level.last_rail_pos.x,
-    y=level.last_rail_pos.y,
-    z=level.last_rail_pos.z + 6
+  local entity = unrailedtrain:place_train({
+    x=level_conf.last_rail_pos.x,
+    y=level_conf.last_rail_pos.y,
+    z=level_conf.last_rail_pos.z + 6
   }, {
     x=0,
     y=0,
     z=1
   })
+
+  if not entity then
+    minetest.log("Error when trying to place train.")
+    return
+  end
+  entity.owner = player
   
   for i,v in ipairs(unrailedtrain.basic_carts) do
-    local cart_obj = minetest.add_entity(level.last_rail_pos, v)
+    local cart_obj = minetest.add_entity(level_conf.last_rail_pos, v)
     unrailedtrain:attach_cart(entity, 1, cart_obj:get_luaentity())
   end
-  -- teleport player to level
-  player:set_pos(level.last_rail_pos)
+
+  return level_conf
 end
 
 function unrailedtrain:find_level(name)
@@ -67,12 +80,17 @@ function unrailedtrain:find_next_level(player_name)
   return nil
 end
 
-function unrailedtrain:register_player(player_name)
-  unrailedtrain.session = {
-    player_name = player_name,
+function unrailedtrain:register_session(lobby)
+  local session = {
+    lobby = lobby,
     current_level = nil,
     carts = {},
     train = nil,
     position = {x=0, y=0, z=0}
   }
+  table.insert(unrailedtrain.sessions, session)
+  return session
 end
+
+minetest.register_on_joinplayer(private_lobby.handle_joinplayer)
+minetest.register_on_leaveplayer(private_lobby.remove_player_from_lobby)

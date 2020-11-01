@@ -8,6 +8,7 @@ unrailedtrain.acceleration = 0.01
 unrailedtrain.crafting_cooldown = 5
 unrailedtrain.levels = {}
 unrailedtrain.session = {}
+unrailedtrain.sessions = {}
 unrailedtrain.groups = {
 	carts = { 
 		"unrailedtrain:cargo_cart_1",
@@ -25,7 +26,7 @@ unrailedtrain.basic_carts = {
 	"unrailedtrain:rail_crafter_1"
 }
 
-function unrailedtrain:generate_level(player, level, add_rails)
+function unrailedtrain:generate_level(level, add_rails)
 	if add_rails then
 		level.last_rail_pos = {
 			x = math.floor(level.minp.x + 12 + math.random() * (level.maxp.x - level.minp.x - 12)),
@@ -40,7 +41,7 @@ function unrailedtrain:generate_level(player, level, add_rails)
 			local ry = data.surface[level.last_rail_pos.z + i][level.last_rail_pos.x].top + 1
 			minetest.set_node({x=level.last_rail_pos.x, y=ry, z=level.last_rail_pos.z + i}, {name="unrailedtrain:indestructible_rail"})
 		end
-	end 
+	end
 end
 
 function unrailedtrain:register_level(level_def)
@@ -96,3 +97,5 @@ dofile(unrailedtrain.modpath.."/game.lua")
 dofile(unrailedtrain.modpath.."/map/init.lua")
 dofile(unrailedtrain.modpath.."/map/levels.lua")
 dofile(unrailedtrain.modpath.."/hud.lua")
+dofile(unrailedtrain.modpath.."/commands.lua")
+dofile(unrailedtrain.modpath.."/nodes.lua")
