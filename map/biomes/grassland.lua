@@ -13,8 +13,24 @@ local biome_def = {
     {chance=15, node="default:stone_with_iron"},
   },
   wood={
-    {chance=3,schematic=minetest.get_modpath("default").."/schematics/apple_tree.mts", offset_x=-3,offset_z=-3,offset_y=-1},
-    {chance=0.05,schematic=minetest.get_modpath("default").."/schematics/bush.mts", offset_x=-1,offset_z=-1},
+    {
+      chance=1.3,
+      lsys={
+        axiom="FFFFFFFA",
+        rules_a = "[&&&FFF&&FFF][&&&++++FFF&&FFF][&&&----FFF&&FFF]",
+        rules_b = "/",
+        rules_c = "/",
+        trunk="default:tree",
+        leaves="default:leaves",
+        angle=30,
+        iterations=2,
+        random_level=0,
+        trunk_type="single",
+        thin_branches=true,
+      },
+    }
+    -- {chance=3,schematic=minetest.get_modpath("default").."/schematics/apple_tree.mts", offset_x=-3,offset_z=-3,offset_y=-1},
+    -- {chance=0.05,schematic=minetest.get_modpath("default").."/schematics/bush.mts", offset_x=-1,offset_z=-1},
   },
   decorations={
     {chance=5, node="default:grass_1"},

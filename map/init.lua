@@ -103,7 +103,7 @@ function unrailedtrain.map_generator.add_resource(x,y,z, parms, resources)
 			resources[d].func(px, py, pz, area, data)
 		elseif resources[d].schematic~=nil then
 			table.insert(parms.mts,{{x=px,y=py,z=pz},resources[d].schematic})
-		elseif resources[d].lsystem~=nil then
+		elseif resources[d].lsys~=nil then
 			table.insert(parms.lsys,{{x=px,y=py,z=pz},resources[d].lsys})
 		end
 	end

@@ -27,9 +27,9 @@ function unrailedtrain:remove_map_level(conf)
 	vm:get_data(data)
 	vm:get_param2_data(vmparam2)
 
-	for z=conf.minp.z, conf.maxp.z do
-		for y=conf.minp.y, conf.maxp.y do
-      for x=conf.minp.x, conf.maxp.x do
+	for z=conf.minp.z - 10, conf.maxp.z + 20 do
+		for y=conf.minp.y - 10, conf.maxp.y + 10 do
+      for x=conf.minp.x - 10, conf.maxp.x + 10 do
 				luautils.place_node(x,y,z, area, data, minetest.get_content_id("air"))
       end
     end
@@ -128,10 +128,9 @@ function unrailedtrain:generate_map_level(conf)
 	vm:calc_lighting()
 	vm:write_to_map()
 
+	minetest.log("lsys size: " .. #lsys)
 	for i = 1, #lsys do
-		if luautils.distance2d(lsys[i][1].x, lsys[i][1].z, station_pos.x, station_pos.z, 1) >= 10 and luautils.distance2d(lsys[i][1].x, lsys[i][1].z, conf.last_rail_pos.x, conf.last_rail_pos.z, 1) >= 15 then
-			minetest.spawn_tree(lsys[i][1],lsys[i][2])
-		end
+		minetest.spawn_tree(lsys[i][1],lsys[i][2])
 	end
 	minetest.log("unrailedtrain generate_level 'level generated'")
 
